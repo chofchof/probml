@@ -1,6 +1,8 @@
 
 # Chapter 9: Linear discriminant analysis
 
+[9. Linear Discriminant Analysis.md](9. Linear Discriminant Analysis.md)
+
 ## Figures
 
 |Figure No. | Notebook | Figure |
