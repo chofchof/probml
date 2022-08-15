@@ -6,9 +6,9 @@
 |Figure No. | Notebook | Figure |
 |--|--|--|
 | 11.1 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
-| 11.2 | [linreg_contours_sse_plot.ipynb](linreg_contours_sse_plot.ipynb) | - |
+| 11.2 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
 | 11.3 | - | [Figure_11.3.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_11.3.png)<br/> |
-| 11.4 | [linregOnlineDemo.ipynb](linregOnlineDemo.ipynb) | - |
+| 11.4 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
 | 11.5 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
 | 11.6 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
 | 11.7 | [geom_ridge.ipynb](geom_ridge.ipynb) | - |
