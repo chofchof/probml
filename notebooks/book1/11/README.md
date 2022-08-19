@@ -11,9 +11,9 @@
 | 11.4 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
 | 11.5 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
 | 11.6 | [linreg_poly_vs_degree.ipynb](linreg_poly_vs_degree.ipynb) | - |
-| 11.7 | [geom_ridge.ipynb](geom_ridge.ipynb) | - |
+| 11.7 | [geom_ridge.ipynb](https://github.com/probml/pyprobml/blob/master/notebooks/book1/11/geom_ridge.ipynb) | - |
 | 11.8 | - | [Figure_11.8.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_11.8.png)<br/> |
-| 11.9 | - | [Figure_11.9_B.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_11.9_B.png)<br/>[Figure_11.9_A.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_11.9_A.png)<br/> |
+| 11.9 | - | [Figure_11.9_A.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_11.9_A.png)<br/>[Figure_11.9_B.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_11.9_B.png)<br/> |
 | 11.10 | [fig_11_10.ipynb](fig_11_10.ipynb) | - |
 | 11.11 | [prostate_comparison.ipynb](prostate_comparison.ipynb) | - |
 | 11.12 | [prostate_comparison.ipynb](prostate_comparison.ipynb) | - |
