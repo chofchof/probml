@@ -26,7 +26,7 @@
 | 11.19 | [fig_11_19.ipynb](fig_11_19.ipynb) | - |
 | 11.20 | [linreg_2d_bayes_demo.ipynb](linreg_2d_bayes_demo.ipynb) | - |
 | 11.21 | [linreg_post_pred_plot.ipynb](linreg_post_pred_plot.ipynb) | - |
-| 11.22 | [linreg_2d_bayes_centering_pymc3.ipynb](linreg_2d_bayes_centering_pymc3.ipynb) | - |
+| 11.22 | [linreg_2d_bayes_centering_pymc.ipynb](linreg_2d_bayes_centering_pymc.ipynb) | - |
 | 11.23 | [multi_collinear_legs_numpyro.ipynb](multi_collinear_legs_numpyro.ipynb) | - |
 | 11.24 | [multi_collinear_legs_numpyro.ipynb](multi_collinear_legs_numpyro.ipynb) | - |
 ## Supplementary material
