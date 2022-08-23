@@ -24,13 +24,13 @@ $$
 p(y|x;w,\sigma^2) = \mathcal{N}(y|f(x,w),\sigma^2)
 $$
 
-We set $f(x,w)=\mathbb{E}[y|x]=w^Tx$. If $x$ is one-dimensional, it is called **simple linear regression**. If $x$ is multi-dimensional, it is called **multiple linear regression**. If the output $y$ is also multi-dimensional, it is called **multivariate linear regression**
+where $f(x,w)=\mathbb{E}[y|x]=w^Tx$. If $x$ is one-dimensional, it is called **simple linear regression**. If $x\in\mathbb{R}^D$ is multi-dimensional, it is called **multiple linear regression**. If the output $y\in\mathbb{R}^J$ is also multi-dimensional, it is called **multivariate linear regression**
 
 $$
 p(y|x;w_1,\dotsc,w_J,\sigma_1^2,\dotsc,\sigma_J^2) = \prod_j \mathcal{N}(y_j|w_j^Tx,\sigma_j^2)
 $$
 
-We can apply a nonlinear transformation $\phi$ to the input $x$ to get 
+We can apply a <u>nonlinear transformation</u> $\phi$ to the input $x$ to get 
 
 $$
 p(y|x;\theta) = \mathcal{N}(y|w^T\phi(x),\sigma^2)
@@ -53,7 +53,7 @@ $$
 \end{align*}
 $$
 
-We focus on estimating the weights $w$. In this case, the NLL is equal (up to irrelevant constants) to the **residual sum of squares (RSS)**
+We <u>focus on estimating the weights</u> $w$. In this case, the NLL is equal (up to irrelevant constants) to the **residual sum of squares (RSS)**
 
 $$
 \begin{split}
@@ -65,7 +65,7 @@ $$
 Thus $\hat w_\text{mle}$ is the point where
 
 $$
-\nabla_w\operatorname{NLL}(w,\sigma^2)=\nabla_w\operatorname{RSS}(w)=X^TXw-X^Ty=0
+\nabla_w\operatorname{NLL}(w,\sigma^2)=\nabla_w\operatorname{RSS}(w)=X^TXw-X^Ty=0 \tag{11.7}
 $$
 
 We can first optimize with respect to $w$, and then solve for the optimal $\sigma$.
@@ -105,7 +105,7 @@ Moreover, the Hessian $H(w)=\nabla_w^2\operatorname{RSS}(w) = X^TX$ is <u>positi
 
 #### 11.2.2.2 Geometric interpretation of least squares
 
-If the case of an **overdetermined system** when $N>D$,
+In the case of an **overdetermined system** when $N>D$,
 
 $$
 \hat y = X\hat w_\text{mle} = XX^\dagger y = X(X^TX)^{-1}X^T y
@@ -144,7 +144,9 @@ Even if it is theoretically possible to compute the pseudoinverse, we should not
    Since $R_1$ is upper triangular, we can solve the last equation using <u>back-substitution</u>, thus <u>avoiding matrix inversion</u>.
 
    ```python
-   scipy.linalg.lstsq(X, y, lapack_driver='gelsy')
+   from scipy.linalg import lstsq
+   # 'gelsy' can be slightly faster on many problems.
+   w, _, rank, _ = lstsq(X, y, lapack_driver='gelsy')
    ```
 
    (See LAPACK: DGELSY, https://netlib.org/lapack/explore-3.1.1-html/dgelsy.f.html)
@@ -155,10 +157,8 @@ Even if it is theoretically possible to compute the pseudoinverse, we should not
 
    ```python
    from scipy.sparse.linalg import cg, gmres
-   w, info = cg(X, y)    # Conjugate Gradient iteration
-                         # X must be symmetric positive definite
-   w, info = gmres(X, y) # Generalized Minimal RESidual iteration
-                         # X must be square
+   w, info = cg(X.T @ X, X.T @ y)    # Conjugate Gradient iteration
+   w, info = gmres(X.T @ X, X.T @ y) # Generalized Minimal RESidual iteration
    ```
 
 > **IMPORTANT**: It is usually essential to <u>standardize the input features before fitting the model</u>, to ensure that they are zero mean and unit variance (see §11.7.5).
@@ -268,7 +268,7 @@ where $C_{xy}=\operatorname{Cov}[X,Y]$ and $C_{xx}=\operatorname{Cov}[X,X]=\math
 > 
 > Note that $\operatorname{corr}[X,Y]=1$ if and only if $Y=aX+b$ and $a>0$.
 >
-> One might expect the correlation coefficient (eq. 3.7) to be related to the slope of the regression line. However, the <u>regression coefficient</u> is in fact given by (eq. 11.27).
+> One might expect the <u>correlation coefficient</u> (eq. 3.7) to be related to the slope of the regression line. However, the <u>regression coefficient</u> is in fact given by (eq. 11.27).
 
 
 
@@ -352,13 +352,13 @@ $$
 
 
 
-To extend the above analysis to multi-dimensional inputs, the easiest approach is to use SGD with a minibatch size of 1.
+To extend the above analysis to multi-dimensional inputs, the easiest approach is to use SGD with a minibatch of size 1:
 
 $$
-w_{t+1} = w_t - \eta_t(w_t^Tx_n-y_n)x_n
+w^{(n+1)} = w^{(n)} - \eta^{(n)}({w^{(n)}}^Tx_n-y_n)x_n \tag{8.60}
 $$
 
-where $n=n(t)$ is the index of the sample chosen at iteration $t$. The overall algorithm is called the **least mean squares (LMS)** algorithm (see §8.4.2).
+Note that $\nabla_w\operatorname{NLL}(w)=\nabla_w\operatorname{RSS}(w)=(w^Tx_n-y_n)x_n$ for one sample $x_n$. This is related to the **least mean squares (LMS)** algorithm (see §8.4.2).
 
 
 
@@ -417,7 +417,7 @@ For 1d inputs, we can check the reasonableness of the model by plotting the resi
 
 
 
-To extend this approach to <u>multi-dimensional inputs</u>, we can plot $\hat y_n$ vs. the true output $y_n$, rather than plotting vs. $x_n$. A good model will have points that lie on a <u>diagonal line</u>.
+To extend this approach to <u>multi-dimensional inputs</u>, we can plot $\hat y_n$ vs. the true output $y_n$, rather than plotting vs. $x_n$. A good model will have points that <u>lie on a diagonal line</u>.
 
 ![](figure_11.6.png)
 
@@ -427,7 +427,7 @@ To extend this approach to <u>multi-dimensional inputs</u>, we can plot $\hat y_
 
 #### 11.2.4.2 Prediction accuracy and $R^2$
 
-- We can assess the fit quantitatively by computing the **RSS (residual sum of squares)**. A model with lower RSS fits the data better.
+- We can assess the fit quantitatively by computing the **RSS (residual sum of squares)**. A model with <u>lower RSS fits the data better</u>.
 
 - Another measure that is used is **root mean squared error (RMSE)**:
 
@@ -441,13 +441,13 @@ $$
   R^2 \equiv 1- \frac{\operatorname{RSS}}{\operatorname{TSS}} = 1 - \frac{\sum_n(\hat y_n-y_n)^2}{\sum_n(\bar y_n-y_n)^2}
   $$
   
-  We see that $R^2$ measures the <u>variance in the predictions relative to a simple constant prediction</u> of $\hat y_n=\bar y$ (no information from other variables). Note that larger $R^2$ values imply a greater reduction in variance (better fit).
+  We see that $R^2$ measures the <u>variance in the predictions relative to a simple constant prediction</u> of $\hat y_n=\bar y$ (no information from other variables). Note that <u>larger values imply a greater reduction in variance (better fit)</u>.
 
   > **Reference**: *When is R squared negative?* https://stats.stackexchange.com/questions/12900/when-is-r-squared-negative
   >
   > $R^2$ compares the fit of the chosen model with that of a horizontal straight line (the null hypothesis). If the chosen model fits worse than a horizontal line, then $R^2$ is negative.
   >
-  > With <u>linear regression with no constraints</u>, $R^2$ <u>must be positive (or zero)</u> and <u>equals the square of the correlation coefficient</u> $r$. A negative $R^2$ is only possible with linear regression when either the intercept or the slope are constrained so that the "best-fit" line (given the constraint) fits worse than a horizontal line. With <u>nonlinear regression</u>, the $R^2$ <u>can be negative</u> whenever the best-fit model (given the chosen equation, and its constraints, if any) fits the data worse than a horizontal line.
+  > With <u>linear regression with no constraints</u>, $R^2$ <u>must be positive (or zero)</u> and <u>equals the square of the correlation coefficient</u>. A negative $R^2$ is only possible with linear regression when either the intercept or the slope are constrained so that the "best-fit" line (given the constraint) fits worse than a horizontal line. With <u>nonlinear regression</u>, the $R^2$ <u>can be negative</u> whenever the best-fit model (given the chosen equation, and its constraints, if any) fits the data worse than a horizontal line.
 
 
 
