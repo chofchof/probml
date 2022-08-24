@@ -140,6 +140,7 @@ If we interpret $e_n\equiv\sigma(a_n)-y_n$ as an <u>error signal</u>, we can see
 #### 10.2.3.4 Deriving the Hessian
 
 The Hessian $H(w)_{ij}\equiv\frac{\partial^2}{\partial w_iw_j}\operatorname{NLL}(w)$ is given by
+
 $$
 H(w) = \nabla_w\nabla_w^T\operatorname{NLL}(w) = \frac{1}{N} \sum_n \sigma(a_n)(1-\sigma(a_n))x_nx_n^T = \frac{1}{N}X^TSX \tag{10.23}
 $$
@@ -147,6 +148,7 @@ $$
 where $S\equiv\operatorname{diag}[\sigma(a_n)(1-\sigma(a_n))]$ has positive diagonal entries.
 
 If $X$ has full rank, $H(w)$ is <u>positive definite</u> so that the NLL is <u>strictly convex</u>, since, for any $v\neq 0$, we have $Xv\neq 0$ so that
+
 $$
 v^T(X^TSX)v = (v^TX^TS^\frac{1}{2})(S^\frac{1}{2}Xv) = \|S^\frac{1}{2}Xv\|_2^2 > 0
 $$
@@ -193,7 +195,7 @@ $$
 
 If the prediction is correct, no change is made, otherwise we move the weights in a direction so as to make the correct answer more likely.
 
-<img src="PRML_Figure_4.7.png" style="zoom: 40%;" />
+<img src="PRML_figure_4.7.png" style="zoom: 40%;" />
 
 > Figure 4.7 [Bis06, p.195]: Illustration of the convergence of the perceptron learning algorithm.
 >
@@ -332,6 +334,7 @@ Since the FIM is independent of the data, this can be faster for problems with m
 One way to reduce such overfitting is to <u>prevent the weights from becoming so large</u>.
 
 We can do this by using a <u>zero-mean Gaussian prior</u>, $p(w)=\mathcal{N}(w|0,\lambda^{-1}I)$, and then using <u>MAP estimation</u> (see §4.5.3).
+
 $$
 \operatorname{PNLL}(w) = \operatorname{NLL}(w) + \lambda\|w\|_2^2
 $$
@@ -525,6 +528,7 @@ The Hessian of the NLL for multinomial logistic regression is given by the $CD\t
 $$
 H(W) = \frac{1}{N} \sum_n \bigl(\operatorname{diag}(\mu_n)-\mu_n\mu_n^T\bigr)\otimes\bigl(x_nx_n^T\bigr)
 $$
+
 and it is positive definite (Exercise 10.1), so the objective is convex.
 
 
