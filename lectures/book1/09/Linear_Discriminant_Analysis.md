@@ -557,7 +557,7 @@ $$
 \bar\theta_k = \frac{\breve\alpha_k+N_k}{\sum_{k'}(\breve\alpha_{k'}+N_{k'})}
 \quad\text{or}\quad
 \bar\theta_{dck} = \frac{\breve\alpha_{dck}+N_{dck}}{\sum_{k'}(\breve\alpha_{dck'}+N_{dck'})}
-\tag{4.158 \& 9.57}
+\tag{4.158, 9.57}
 $$
 
 If $\breve\alpha_k=0$ for all $k$, this reduces to the MLE, $\hat\theta_{dck}=\frac{N_{dck}}{N_c}$. Notice that $N_c=\sum_k N_{dck}$ for all $d$.
