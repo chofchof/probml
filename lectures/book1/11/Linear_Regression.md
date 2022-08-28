@@ -12,13 +12,7 @@ $$
 
 ## 11.2 Least squares linear regression
 
-We assume that the target $y$ is given by a <u>deterministic function</u> $f(x,w)$ with <u>additive Gaussian noise</u> $\epsilon\sim\mathcal{N}(0,\sigma^2)$
-
-$$
-y = f(x, w) + \epsilon
-$$
-
-The term **linear regression** refers to a model
+We assume that $y=f(x,w)+\epsilon$, where $f(x,w)$ is a <u>deterministic function</u> and $\epsilon\sim\mathcal{N}(0,\sigma^2)$ is an <u>additive Gaussian noise</u>. The term **linear regression** refers to a model
 
 $$
 p(y|x;w,\sigma^2) = \mathcal{N}(y|f(x,w),\sigma^2)
@@ -119,17 +113,15 @@ Even if it is theoretically possible to compute the pseudoinverse, we should not
 1. A better and more general approach is to use the <u>SVD</u>, $X=USV^T$. Then $X^\dagger=VS^\dagger U^T$, where $S^\dagger$ is formed by replacing every non-zero diagonal entry by its reciprocal and transposing the resulting matrix (see §7.5.3), and
 
    $$
-   \hat y = XX^\dagger y = (USV^T)(VS^\dagger U^T)y = (U_KU_K^T)y
+   \hat y = XX^\dagger y = (USV^T)(VS^\dagger U^T)y = UU^Ty \tag{11.70}
    $$
    
-   where $U_K$ contains the first $\operatorname{rank} X$ columns of $U$.
-
    ```python
-   from scipy.linalg import lstsq
+from scipy.linalg import lstsq
    # lstsq.default_lapack_driver = 'gelsd'
    w, residues, rank, singular_values = lstsq(X, y)
    ```
-
+   
    (See LAPACK: DGELSD, https://netlib.org/lapack/explore-3.1.1-html/dgelsd.f.html)
 
 2. If $N\gg D$, it can be quicker to use <u>QR decomposition</u>, $X=QR$ where $Q$ is an orthogonal matrix and $R=\begin{bmatrix}R_1\\0\end{bmatrix}$ with a $(D+1)\times(D+1)$ upper triangular matrix $R_1$ (see §7.6.2).
@@ -218,7 +210,7 @@ $$
 = \frac{1}{2}(X_cw-y_c)^T(X_cw-y_c)
 $$
 
-where $X_c$ is the $N\times D$ <u>centered design matrix</u> containing $(x_n-\bar x)^T$ along its rows, and $y_c=y-\bar y1_N$ is the <u>centered output vector</u>. Notice that $w=(w_1,\dotsc,w_D)$ without the bias $w_0$.
+where $X_c$ is the $N\times D$ <u>centered design matrix</u> containing $(x_n-\bar x)^T$ along its rows, and $y_c=y-\bar y1_N$ is the <u>centered output vector</u>. Remember that $w=(w_1,\dotsc,w_D)$ does not contain the bias $w_0$.
 
 Thus we can first compute $\hat w$ on the centered input matrix:
 
@@ -241,9 +233,9 @@ clf.predict(X)  # predict using the linear model
 clf.score(X, y) # coefficient of determination (eq. 11.51) of the prediction
 ```
 
-By default, `LinearRegression()` solves (eq. 11.25) for $\hat w$ using the SVD (`scipy.linalg.lstsq`) of the <u>centered</u> design matrix $X_c$ and $y_c$. Then the bias $\hat w_0$ is calculated from (eq. 11.26).
+By default, `LinearRegression()` solves (eq. 11.25) for $\hat w$ using the SVD (`scipy.linalg.lstsq`) of the <u>centered</u> design matrix $X_c$ and the <u>centered</u> output vector $y_c$. And then the bias $\hat w_0$ is calculated from (eq. 11.26).
 
-On the contrary, `fit_intercept=False` prevents $X$ and $y$ from being centered. In this case (eq. 11.9) is used instead. If the first column of $X$ corresponds to the bias $w_0$, this option must be set to `False`.
+On the contrary, `fit_intercept=False` <u>prevents</u> $X$ and $y$ from being centered. In this case (eq. 11.9) is used directly. If the first column of $X$ corresponds to the bias $w_0$, this option must be set to `False`.
 
 - `clf.coef_`: The MLE estimate $\hat w$.
 
@@ -372,7 +364,7 @@ since $\nabla_w\operatorname{NLL}(w)=\nabla_w\operatorname{RSS}(w)=(w^Tx_n-y_n)x
 
 #### 11.2.3.5 Deriving the MLE from a generative perspective
 
-Linear regression is a discriminative model of the form $p(y|x)$. However, we can also use <u>generative model for regression</u>. The goal is to compute the conditional expectation
+Linear regression is a <u>discriminative model</u> of the form $p(y|x)$. However, we can also use <u>generative model</u> for regression. The goal is to compute the conditional expectation
 
 $$
 f(x) = \mathbb{E}[y|x] = \int y\,p(y|x)\,dy = \int y\,\frac{p(x,y)}{p(x)}\,dy = \frac{\int y\,p(x,y)\,dy}{\int p(x,y)\,dy}
@@ -388,7 +380,7 @@ $$
 \end{split}
 $$
 
-Hence from (eq. 3.28) we have $\mathbb{E}[y|x] = \mu_y+\Sigma_{xy}^T\Sigma_{xx}^{-1}(x-\mu_x)$. We can rewrite this as $\mathbb{E}[y|x]=w_0+w^Tx$ by defining
+Hence from (eq. 3.28) we have $\mathbb{E}[y|x] = \mu_y+\Sigma_{xy}^T\Sigma_{xx}^{-1}(x-\mu_x)=w^Tx+w_0$, where
 
 $$
 \begin{split}
@@ -397,7 +389,7 @@ w_0 &= \mu_y - \Sigma_{xy}^T\Sigma_{xx}^{-1}\mu_x = \mu_y-w^T\mu_x = \bar y-w^T\
 \end{split}
 $$
 
-This matches the MLEs for the discriminative model as (eq. 11.25 and 11.26).
+This matches the MLEs for the discriminative model in (eq. 11.25 and 11.26).
 
 Thus we see that fitting the joint model, and then conditioning it, <u>yields the same result</u> as fitting the conditional model. However, <u>this is only true for Gaussian models</u>.
 
@@ -468,7 +460,7 @@ $$
 > There are two reasons why we are often <u>not satisfied with the least squares estimates</u> $\hat w_\text{mle}$.
 >
 > - The first is *<u>prediction accuracy</u>*. The least squares estimates often have <u>low bias but large variance</u>. Prediction accuracy can sometimes be <u>improved by shrinking or setting some coefficients to zero</u>. By doing so we sacrifice a little bit of bias to reduce the variance of the predicted values, and hence may improve the overall prediction accuracy. (See §3.4 Shrinkage Methods, [HTF09])
-> - The second reason is *<u>interpretation</u>*. With a large number of variables (or features), we often would like to determine a <u>smaller variable subset</u> that exhibit the strongest effects. In order to get the big picture, we are willing to sacrifice some of the small details. (See §3.3 Subset Selection, [HTF09])
+> - The second is *<u>interpretation</u>*. With a large number of variables (or features), we often would like to determine a <u>smaller variable subset</u> that exhibit the strongest effects. In order to get the big picture, we are willing to sacrifice some of the small details. (See §3.3 Subset Selection, [HTF09])
 >
 > **Ridge regression** <u>shrinks the regression coefficients</u> by imposing a penalty on their size. The ridge coefficients minimize a penalized residual sum of squares.
 
@@ -476,9 +468,14 @@ $$
 
 #### MLE can result in overfitting.
 
-**Ridge regression** uses <u>MAP estimation with a zero-mean Gaussian prior</u>, $p(w)=\mathcal{N}(w|0,\tau^2 I)$.
+**Ridge regression** can be derived as the <u>MAP estimation</u> of the posterior
+$$
+p(w|\mathcal{D},\sigma^2) \propto p(\mathcal{D}|w,\sigma^2)\,p(w) = \mathcal{N}(y|Xw,\sigma^2I)\,\mathcal{N}(w|0,\tau^2I)
+$$
 
-Set the <u>strength of the regularizer</u> $\lambda\equiv\sigma^2/\tau^2$ which is proportional to the strength of the prior $1/\tau^2$.
+with <u>linear regression</u> as a likelihood and <u>zero-mean Gaussian</u> prior.
+
+Let $\lambda\equiv\sigma^2/\tau^2$ be the <u>strength of the regularizer</u>, which is proportional to the strength of the prior $1/\tau^2$.
 
 $$
 \begin{align*}
@@ -496,10 +493,10 @@ This technique is called $\ell_2$ **regularization** or **weight decay**.
 From (eq. 11.53) the MAP estimate corresponds to minimizing
 
 $$
-J(w) \equiv (y-Xw)^T(y-Xw) + \lambda\|w\|_2^2 \tag{11.55}
+J(w) \equiv (y-Xw)^T(y-Xw) + \lambda w^Tw \tag{11.55}
 $$
 
-Notice that we also <u>penalize the bias</u> $w_0$. Thus the derivative is given by
+The derivative is given by
 
 $$
 \nabla_w J(w) = 2 (X^TXw-X^Ty+\lambda w)
@@ -508,7 +505,7 @@ $$
 and hence
 
 $$
-\hat w_\text{map} = (X^TX+\lambda I_{D+1})^{-1}X^Ty = \bigl(\sum_n x_nx_n^T + \lambda I_{D+1}\bigr)^{-1}\sum_n y_nx_n \tag{11.57}
+\hat w_\text{map} = (X^TX+\lambda I)^{-1}X^Ty = \bigl(\sum_n x_nx_n^T + \lambda I\bigr)^{-1}\sum_n y_nx_n \tag{11.57}
 $$
 
 
@@ -523,6 +520,7 @@ $$
 Suppose that $w_0$ has its own regularization coefficient $\lambda_0$.
 
 Denote by $\bar x_0=(1+\frac{\lambda_0}{N})^{-1}\bar x$ and $\bar y_0=(1+\frac{\lambda_0}{N})^{-1}\bar y$. Then the optimizer of
+
 $$
 J(w,w_0) = (y-Xw-w_01_N)^T(y-Xw-w_01_N) + \lambda w^Tw + \lambda_0 w_0^2
 $$
@@ -536,19 +534,21 @@ $$
 \end{split} \tag{*}
 $$
 
-where $X_{c_0}$ is the centered design matrix with $(x_n-\bar x_0)^T$ along its rows and $y_{c_0}=y-\bar y_01_N$.
+where $X_{c_0}$ is the centered matrix with $(x_n-\bar x_0)^T$ along its rows and $y_{c_0}=y-\bar y_01_N$.
 
 > **Reference**: [HTF09, p.64]
 >
 > Penalization of the intercept would make the procedure depend on the origin chosen for $y$; that is, adding a constant $c$ to each of the targets $y_n$ would not simply result in a shift of the predictions by the same amount $c$.
 
 If we <u>do not penalize</u> $w_0$, i.e., $\lambda_0=0$, then (eq. *) implies that
+
 $$
 \hat w = (X_c^TX_c+\lambda I_D)^{-1}X_c^T(y-\bar y1_N) \quad\text{and}\quad \hat w_0=\bar y-\hat w^T\bar x
 $$
+
 Let $y'=y+c1_N$. Then $\hat w$ is not changed by adding a constant vector $c1_N$ to the target $y$, since $y'-\bar y'1_N=y'-(\bar y+c)1_N=y-\bar y1_N$. It follows that $\hat y'-\hat y=\bar y'-\bar y=c$.
 
-However, we cannot have the same result either in (eq. 11.57) or in (eq. *) with nonzero $\lambda_0$.
+However, we cannot have the same result with nonzero $\lambda_0$.
 
 
 
@@ -572,9 +572,9 @@ The argument `alpha` is nothing but the strength of the regularizer $\lambda$.
 
 > **IMPORTANT**:  If `fit_intercept=True`, $w_0$ will <u>not be penalized</u>, i.e., $\lambda_0=0$ so that $X_{c_0}=X_c$ and $y_{c_0}=y_c$ in (eq. *). On the contrary, if `fit_intercept=False`, $w_0$ will <u>be penalized</u> using $\lambda_0=\lambda$.
 
-By default, `Ridge()` solves (eq. *) for $\hat w$ and $\hat w_0$.
+By default, `Ridge()` solves (eq. *) for $\hat w$ and then $\hat w_0$.
 
-On the contrary, `fit_intercept=False` prevents $X$ and $y$ from being centered. In this case (eq. 11.57) is used instead. If the first column of $X$ corresponds to the bias $w_0$, this option must be set to `False`.
+However, `fit_intercept=False` prevents $X$ and $y$ from being centered. In this case (eq. 11.57) is used directly. If the first column of $X$ corresponds to the bias $w_0$, this option must be set to `False`.
 
 - `clf.coef_`: The MAP estimate $\hat w$.
 - `clf.intercept_`: The MAP estimate $\hat w_0$. It is always zero if `fit_intercept=False`.
@@ -583,7 +583,17 @@ The argument `solver='auto'` selects the `sag` solver if `fit_intercept=True`. O
 
 
 
-> **IMPORTANT**: In the following we assume that $X$ is an $N\times D$ matrix and we will penalize $w_0$ using (eq. 11.57) for simple notation.
+> **IMPORTANT**: In the following we assume that $X$ is an $N\times D$ matrix (without the bias) and focus on
+>
+> $$
+> \hat w_\text{map} = (X^TX+\lambda I_D)^{-1}X^Ty \tag{11.57}
+> $$
+>
+> **Reference**: [HTF09, p.64]
+>
+> - Notice that with the choice of quadratic penalty $w^Tw$, the ridge regression solution $\hat w_\text{map}$ is again a linear function of $y$.
+> - The solution adds a positive constant $\lambda$ to the diagonal of $X^TX$ before inversion. This makes the problem nonsingular, even if $X^TX$ is <u>not of full rank</u>.
+> - It was the <u>main motivation</u> for ridge regression when it was first introduced in statistics (Hoerl and Kennard, 1970). Traditional descriptions of ridge regression start with definition (11.57).
 
 
 
@@ -591,9 +601,9 @@ The argument `solver='auto'` selects the `sag` solver if `fit_intercept=True`. O
 
 Naively computing $\hat w_\text{map}$ using matrix inversion is a bad idea, since it can be slow and numerically unstable.
 
-We assume the prior is $p(w)=\mathcal{N}(0,\Lambda^{-1})$, where $\Lambda$ is the precision matrix. In the case of ridge regression, $\Lambda=\tau^{-2}I_D$.
+Suppose that the prior is $p(w)=\mathcal{N}(w|0,\Lambda^{-1})$, where $\Lambda$ is the precision matrix (symmetric and positive-definite). In the case of ridge regression, $\Lambda=\tau^{-2}I_D$.
 
-Let $\tilde X=\begin{pmatrix}X/\sigma \\ \sqrt{\Lambda}\end{pmatrix}$ and $\tilde y=\begin{pmatrix}y/\sigma \\ 0_D\end{pmatrix}$ where $\Lambda=\sqrt{\Lambda}\sqrt{\Lambda}^T$ is a <u>Cholesky decomposition</u> of $\Lambda$. Then the RSS on this expanded data is equivalent to <u>penalized</u> RSS on the original data:
+Let $\tilde X=\begin{pmatrix}X/\sigma \\ \sqrt{\Lambda}\end{pmatrix}$ and $\tilde y=\begin{pmatrix}y/\sigma \\ 0_D\end{pmatrix}$ where $\Lambda=\sqrt{\Lambda}\sqrt{\Lambda}^T$ is a <u>Cholesky decomposition</u>. Then the RSS on this expanded data is equivalent to <u>penalized</u> RSS on the original data:
 
 $$
 \begin{split}
@@ -603,7 +613,7 @@ f(w) &= (\tilde y-\tilde Xw)^T(\tilde y-\tilde Xw)
 \end{split}
 $$
 
-In the case of ridge regression, $f(w)=\frac{1}{\sigma^2}J(w)$ in (eq. 11.55). Hence the MAP estimate can be given by
+In the case of ridge regression, $f(w)=\frac{1}{\sigma^2}J(w)$ in (eq. 11.55). Hence the MAP estimate is given by
 
 $$
 \hat w_\text{map}=(\tilde X^T\tilde X)^{-1}\tilde X^T\tilde y
@@ -619,36 +629,33 @@ In particular, we can compute the QR decomposition of the $(N+D)\times D$ matrix
 
 > **Reference**: [HTF09, p.64-66]
 >
-> The **singular value decomposition (SVD)** of the (centered) design matrix $X$ gives  us some additional insight into the nature of ridge regression.
-> 
-> $$
-> X = USV^T
-> $$
-> 
-> Here $U$ and $V$ are $N\times D$ and $D\times D$ orthogonal matrices, with the columns of $U$ spanning the column space of $X$, and the columns of $V$ spanning the row space. $S$ is a $D\times D$ diagonal matrix, with diagonal entries $\sigma_1\geq \sigma_2\geq\dotsb\geq\sigma_D\geq 0$ called the singular values of $X$. If one or more values $s_d=0$, $X$ is singular.
+> The **singular value decomposition (SVD)** of $X$ gives us some additional insight into the nature of ridge regression.
 >
-> Suppose $X$ has a full rank. Using the SVD we can write the least squares fitted vector as
-> 
+> $$
+> X = USV^T \quad\text{or}\quad Xv_d=\sigma_du_d
+> $$
+>
+> - $U$ is an $N\times D$ matrix with <u>orthonormal columns</u> $u_d$ spanning the <u>column space</u> of $X$ such that $\hat y\in\operatorname{Col}X\subseteq\mathbb{R}^N$. Note that $U^TU=I_D$.
+> - $V$ is a $D\times D$ <u>orthogonal matrix</u> and the columns $v_d$ of $V$ spans the <u>row space</u> of $X$ such that $x_n\in\operatorname{Row}X\subseteq\mathbb{R}^D$. Note that $V^TV=VV^T=I_D$.
+> - $S$ is a $D\times D$ <u>diagonal matrix</u> with diagonal entries $\sigma_1\geq\dotsb\geq\sigma_D\geq 0$ called the **singular values** of $X$. If one or more values $\sigma_d=0$, $X$ is singular.
+>
+> Using the SVD we can write the least squares fitted vector as
+>
 > $$
 > \begin{split}
 > \hat y = X\hat w_\text{mle} &= X(X^TX)^{-1}X^Ty = (USV^T)(VS^{-2}V^T)(VSU^T)y \\
 > &= UU^Ty = \sum_d u_du_d^Ty
 > \end{split} \tag{11.70}
 > $$
-> 
-> where the $u_d$ are the columns of $U$.
 >
 > Now the ridge solutions are
-> 
+>
 > $$
 > \begin{split}
-> \hat y = X\hat w_\text{map} &= X(X^TX+\lambda I)^{-1}X^Ty = (USV^T)(VS^2V^T+\lambda I)^{-1}(VSU^T)y \\
-> &= (USV^T)(V(S^2+\lambda I)^{-1}V^T)(VSU^T)y \\
+> \hat y = X\hat w_\text{map} &= X(X^TX+\lambda I)^{-1}X^Ty = (USV^T)(V(S^2+\lambda I)^{-1}V^T)(VSU^T)y \\
 > &= US(S^2+\lambda I)^{-1}SU^Ty = \sum_d u_d\Bigl(\frac{\sigma_d^2}{\sigma_d^2+\lambda}\Bigr)u_d^Ty 
 > \end{split} \tag{11.69}
 > $$
-> 
-> Note that $U^Ty$ are the coordinates of $y$ w.r.t. (or the projections of $y$ onto) the orthonormal basis $U$.
 
 
 
@@ -656,9 +663,14 @@ In the case when $D\gg N$ (usual in ridge regression), it is faster to use SVD t
 
 > **Reference**: [HTF09, §18.3.5 Computational ShortCuts When $p\gg N$, p.659]
 >
-> Given the $N\times D$ design matrix $X$, let $X=(US)V^T=RV^T$ be the SVD of $X$; that is, $V$ is $D\times N$ with orthonormal columns, $U$ is $N\times N$ orthogonal, and $S$ a diagonal matrix with elements $\sigma_1\geq\sigma_2\geq\dotsb\geq\sigma_N\geq 0$. The matrix $R$ is $N\times N$, with rows $r_n^T$.
+> Given the $N\times D$ design matrix $X$, let $X=(US)V^T=RV^T$ be the SVD of $X$.
 >
-> Replacing $X$ by $RV^T$ we can show that
+> - $U$ is an $N\times N$ orthogonal matrix such that $U^TU=UU^T=I_N$.
+> - $V$ is a $D\times N$ matrix with orthonormal columns such that $V^TV=I_N$.
+> - $S$ is an $N\times N$ diagonal matrix with diagonal entries $\sigma_1\geq\dotsb\geq\sigma_N\geq 0$.
+> - $R\equiv US$ is an $N\times N$ matrix with rows $r_n^T$.
+>
+> Replacing $X$ by $RV^T$ we have
 >
 > $$
 > \begin{split}
@@ -677,45 +689,66 @@ In the case when $D\gg N$ (usual in ridge regression), it is faster to use SVD t
 
 ### 11.3.2 Connection between ridge regression and PCA
 
-> **Reference**: [HTF09, p.67]
->$$
-> \hat y = X\hat w_\text{map} = X(X^TX+\lambda I)^{-1}X^Ty = \sum_d u_d\Bigl(\frac{\sigma_d^2}{\sigma_d^2+\lambda}\Bigr)u_d^Ty \tag{11.69}
+> **Reference**: [HTF09, p.66]
+>
+> Like linear regression, $\hat y=X\hat w_\text{mle}=\sum_d u_d(u_d^Ty)$, ridge regression computes the coordinates (or projection) of $y$ w.r.t. the orthonormal basis $u_d$.
+> 
 > $$
-> 
->where the $u_d$ are the columns of $U$. Since $\lambda\geq 0$, we have $0\leq\frac{\sigma_d^2}{\sigma_d^2+\lambda}\leq 1$.
-> 
->Like linear regression, ridge regression computes the coordinates of $y$ with respect to the orthonormal basis $U$. It then **shrinks** these coordinates by the factors $\frac{\sigma_d^2}{\sigma_d^2+\lambda}$. This means that a <u>greater amount of shrinkage</u> is applied to the coordinates of basis vectors with <u>smaller</u> $\sigma_d^2$.
-> 
+> \hat y = X\hat w_\text{map} = \sum_d u_d\Bigl(\frac{\sigma_d^2}{\sigma_d^2+\lambda}\Bigr)(u_d^Ty) \tag{11.69}
+> $$
+>
+> It then **shrinks** $u_d^Ty$ by the factors $\frac{\sigma_d^2}{\sigma_d^2+\lambda}$. This means that a <u>greater amount of shrinkage</u> is applied to the coordinates of basis vectors $u_d$ with <u>smaller</u> $\sigma_d^2$.
 
 
 
-If $\sigma_n^2$ is small compared to $\lambda$, then the direction $u_n$ will not have much effect on the prediction. In view of this, we define the effective number of **degrees of freedom** of the model
+#### What does a small value of $\sigma_d^2$ mean?
+
+> **Reference**: [HTF09, p.66]
+>
+> The SVD of the <u>centered</u> design matrix $X$ is another way of expressing the <u>principal components</u> of the variables in $X$.
+>
+> - The <u>sample covariance</u> matrix is given by $\Sigma = \frac{1}{N-1}X^TX=\frac{1}{N-1}VS^2V^T$, which is the eigen decomposition of $\Sigma$ (up to a factor ${N-1}$).
+> - The <u>first principal component</u> direction $v_1$ has the property that $z_1 = Xv_1=\sigma_1u_1\in\operatorname{Col}X\subseteq\mathbb{R}^N$ (projections of $x_n$'s onto $v_1$) has the <u>largest variance</u> $\frac{\sigma_1^2}{N}$ amongst all normalized linear combinations of the columns of $X$, since $\mathbb{V}[u_d]=\frac{1}{N}$.
+> - Subsequent principal components $z_d$ have maximum variance $\frac{\sigma_d^2}{N}$, subject to being orthogonal to the earlier ones. Conversely the <u>last principal component</u> has <u>minimum variance</u>.
+> - Hence the <u>small singular values</u> $\sigma_d$ correspond to <u>directions</u> $u_d$ in the column space of $X$ <u>having small variance</u> $\frac{\sigma_d^2}{N}$, and ridge regression <u>shrinks these directions the most</u>.
+
+
+
+If $\sigma_n^2$ is <u>small</u> compared to $\lambda$, then the direction $u_n$ will <u>not have much effect</u> on the prediction. In view of this, we define the effective number of **degrees of freedom** of the model
 
 $$
 \operatorname{dof}(\lambda) = \sum_n \frac{\sigma_n^2}{\sigma_n^2+\lambda}
 $$
 
-Note that $\operatorname{dof}(0)=N$ and $\operatorname{dof}(\lambda)\to0$ as $\lambda\to\infty$.
+Since $\lambda\geq 0$, we have $0\leq\frac{\sigma_d^2}{\sigma_d^2+\lambda}\leq 1$. Note that $\operatorname{dof}(0)=N$ and $\operatorname{dof}(\lambda)\to0$ as $\lambda\to\infty$.
 
 
 
 #### Why is this behavior desirable?
 
-The squared singular values $\sigma_d^2$ are equal to the eigenvalues of $X^TX$ so that <u>small singular values</u> $\sigma_d$ corresponds to directions with <u>high posterior variance</u>. It is these directions which ridge shrinks the most.
+The squared singular values $\sigma_d^2$ are equal to the eigenvalues of $X^TX$ so that <u>small singular values</u> $\sigma_d$ corresponds to directions $v_d$ with <u>high posterior variance</u>. It is these directions which ridge shrinks the most.
 
-> In §11.7.2, we will show that the posterior covariance of $p(w|\mathcal{D},\sigma^2)$ is $\mathring\Sigma=\sigma^2(X^TX+\lambda I)^{-1}$ in ridge regression.
+>  From §11.7.2, the <u>posterior covariance</u> of $p(w|\mathcal{D},\sigma^2)$ in ridge regression is
 >
-> Thus the direction in which we are most uncertain about $w$ is determined by the eigenvector of $(X^TX+\lambda I)^{-1}=V(S^2+\lambda I)^{-1}V^T$ with the <u>largest eigenvalue</u> (high posterior variance).
+>  $$
+>  \mathring\Sigma=\sigma^2(X^TX+\lambda I)^{-1} = \sigma^2V(S^2+\lambda I)^{-1}V^T
+>  $$
 >
-> This corresponds to the (right) singular vector $v_d$ with the <u>smallest singular value</u> $\sigma_d$ and ridge regression shrinks these directions the most.
+> Thus the direction in which we are <u>most uncertain</u> about $w$ is determined by the eigenvector $v_d\in\operatorname{Row}X\subseteq\mathbb{R}^D$ with the <u>largest eigenvalue</u> (high posterior variance) $\frac{1}{\sigma_d^2+\lambda}$ which corresponds to the <u>smallest singular value</u> $\sigma_d$.
 
 <img src="PRML_figure_3.15.png" style="zoom:50%;" />
 
 > Figure 3.15 [Bis06, p.170]: Contours of the likelihood function $p(\mathcal{D}|w,\sigma^2)$ (red) and the prior $p(w)$ (geen).
 >
-> - For $\lambda=0$, the mode of the posterior $p(w|\mathcal{D},\sigma^2)$ is given by the MLE $\hat w_\text{mle}$, whereas for $\lambda>0$, the mode is the MAP $\hat w_\text{map}$ (see §11.7.2).
-> - In the direction $w_1$ (ill-determined by $\mathcal{D}$ with high posterior variance) the squared singular value $\sigma_1^2$ is small compared with $\lambda$ and so $\frac{\sigma_1^2}{\sigma_1^2+\lambda}$ is close to 0, and the corresponding ${\hat w_\text{map}}_1$ is also close to the prior mean, which is 0.
-> - By contrast, in the direction $w_2$ (well-determined by $\mathcal{D}$ with low posterior variance) the squared singular value $\sigma_2^2$ is large compared to $\lambda$ and so $\frac{\sigma_1^2}{\sigma_1^2+\lambda}$ is close to 1, and the corresponding ${\hat w_\text{map}}_2$ is close to ${\hat w_\text{mle}}_2$.
+> - From §11.7.2, the posterior mean (or mode) of $p(w|\mathcal{D},\sigma^2)$ in ridge regression is
+> 
+> $$
+> \hat w_\text{map} = (X^TX+\lambda I)^{-1}X^Ty = \sum_d\Bigl(\frac{\sigma_d}{\sigma_d^2+\lambda}\Bigr)(u_d^Ty)v_d
+> $$
+>
+> - In the direction $v_1$ (<u>ill-determined</u> by $\mathcal{D}$ with <u>high posterior variance</u>) the squared singular value $\sigma_1^2$ is <u>small</u> compared with $\lambda$ and so $\frac{\sigma_1^2}{\sigma_1^2+\lambda}$ is close to 0, and the projection of $\hat w_\text{map}$ onto $v_1$ is also 0. 
+>
+> - By contrast, in the direction $v_2$ (<u>well-determined</u> by $\mathcal{D}$ with <u>low posterior variance</u>) the squared singular value $\sigma_2^2$ is <u>large</u> compared to $\lambda$ and so $\frac{\sigma_2^2}{\sigma_2^2+\lambda}$ is close to 1, and the projection of $\hat w_\text{map}$ onto $v_2$ is close to the projection of $\hat w_\text{mle}$ onto $v_2$.
 
 In this way, ill-determined parameters are reduced in size towards 0. This is called **shrinkage**.
 
@@ -746,43 +779,26 @@ This technique is a supervised version of PCA (see §20.1).
 
 ### 11.3.3 Choosing the strength of the regularizer
 
-To find the optimal value of $\lambda$, we can try a finite number of distinct values, and use cross validation to estimate their expected loss (see §4.5.5.2).
+To find the <u>optimal value</u> of $\lambda$, we can try a finite number of distinct values, and use cross validation to estimate their expected loss (see §4.5.5.2).
 
 ![](figure_4.5_d.png)
 
 > Figure 4.5: (d) MSE vs. strength of regularizer $\lambda$. The degree of regularization increases from left to right, so model complexity decreases from left to right.
 
-This approach can be quite expensive if we have many values to choose from. Fortunately, we can often **warm start** the optimization procedure, using the value of $\hat w(\lambda_k)$ as an initializer for $\hat w(\lambda_{k+1})$, where $\lambda_{k+1}<\lambda_k$; in other words, we start with a highly constrained model (strong regularizer), and then gradually relax the constraints (decrease the amount of regularization). The set of parameters $\hat w_k$ that we sweep out in this way is known as the **regularization path**. See Figure 11.10 (a) for an example.
+This approach can be <u>quite expensive</u> if we have many values to choose from. Fortunately, we can often **warm start** the optimization procedure, using the value of $\hat w(\lambda_k)$ as an initializer for $\hat w(\lambda_{k+1})$, where $\lambda_{k+1}<\lambda_k$; in other words, we <u>start with a highly constrained model</u> (strong regularizer), and then <u>gradually relax the constraints</u> (decrease the amount of regularization). The set of parameters $\hat w_k$ that we sweep out in this way is known as the **regularization path** (see §11.4.4).
 
-We can also use an empirical Bayes approach to choose $\lambda$. In particular, we choose the hyperparameter by computing $\hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)$, where $p(\mathcal{D}|\lambda)$ is the marginal likelihood or evidence. Figure 4.7 (b) shows that this gives essentially the same result as the CV estimate. However, the Bayesian approach has several advantages: Computing $p(\mathcal{D}|\lambda)$ can be done by fitting a single model, whereas CV has to fit the same model $K$ times; and $p(\mathcal{D}|\lambda)$ is a smooth function of $\lambda$, so we can use gradient based optimization instead of discrete search.
+We can also use an <u>empirical Bayes approach</u> to choose $\lambda$. In particular, we choose the hyperparameter by computing $\hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)$, where $p(\mathcal{D}|\lambda)$ is the marginal likelihood or evidence. Figure 4.7 (b) shows that this gives essentially the same result as the CV estimate.
 
+![](figure_4.7_b.png)
 
+> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The degree of regularization increases from left to right, so model complexity decreases from left to right.
+>
+> (b) 5-fold cross-validation estimate of MSE; error bars are standard errors of the mean (in log scale). Vertical line is the point $\lambda$ chosen by the smallest MSE.
 
+However, <u>the Bayesian approach has several advantages</u>.
 
-
-## 11.4 Lasso regression
-
-Sometimes we want the parameters to not just be small, but to be exactly zero, i.e., we want $\hat w$ to be sparse, so that we minimize the $\ell_0$-norm:
-
-$$
-\|w\|_0 = \sum_d \mathbb{I}(|w_d|>0)
-$$
-
-This is useful because it can be used to perform feature selection.
-
-To see this, note that the prediction has the form $f(x;w)=\sum_d w_dx_d$, so if any $w_d=0$, we ignore the corresponding feature $x_d$. (The same idea can be applied to nonlinear models, such as DNNs, by encouraging the first layer weights to be sparse.)
-
-
-
-### 11.4.1 MAP estimation with a Laplace prior ($\ell_1$ regularization)
-
-There are many ways to compute such sparse estimates. We focus on MAP estimation using the Laplace distribution as the prior:
-
-$$
-p(w|\lambda) = \prod_d \operatorname{Laplace}(w_d|0,\tfrac{1}{\lambda}) \propto \prod_d e^{-\lambda|w_d|}
-$$
-
-where $\lambda$ is the sparsity parameter, and $\operatorname{Laplace}(w|\mu,b)\equiv\frac{1}{2b}\exp(-\frac{|w-\mu|}{b})$. Here $\mu$ is a location parameter and $b>0$ is a scale parameter.
+- Computing $p(\mathcal{D}|\lambda)$ can be done by fitting a single model, whereas CV has to fit the same model $K$ times.
+- $p(\mathcal{D}|\lambda)$ is a smooth function of $\lambda$, so we can use gradient based optimization instead of discrete search.
 
 
 
