@@ -459,10 +459,10 @@ $$
 >
 > There are two reasons why we are often <u>not satisfied with the least squares estimates</u> $\hat w_\text{mle}$.
 >
-> - The first is *<u>prediction accuracy</u>*. The least squares estimates often have <u>low bias but large variance</u>. Prediction accuracy can sometimes be <u>improved by shrinking or setting some coefficients to zero</u>. By doing so we sacrifice a little bit of bias to reduce the variance of the predicted values, and hence may improve the overall prediction accuracy. (See §3.4 Shrinkage Methods, [HTF09])
+> - The first is *<u>prediction accuracy</u>*. The least squares estimates often have <u>low bias</u> $\mathbb{E}[\hat y-y]$ but <u>high variance</u> $\mathbb{V}[\hat y]$. Prediction accuracy can sometimes be <u>improved by shrinking or setting some coefficients to zero</u>. By doing so we <u>sacrifice a little bit of bias to reduce the variance</u> of the predicted values, and hence may improve the overall prediction accuracy. (See §3.4 Shrinkage Methods, [HTF09])
 > - The second is *<u>interpretation</u>*. With a large number of variables (or features), we often would like to determine a <u>smaller variable subset</u> that exhibit the strongest effects. In order to get the big picture, we are willing to sacrifice some of the small details. (See §3.3 Subset Selection, [HTF09])
 >
-> **Ridge regression** <u>shrinks the regression coefficients</u> by imposing a penalty on their size. The ridge coefficients minimize a penalized residual sum of squares.
+> **Ridge regression** <u>shrinks the regression coefficients</u> $w$ by imposing a penalty on their size $\|w\|_2^2$. The ridge coefficients <u>minimize a penalized RSS</u>.
 
 
 
@@ -475,7 +475,7 @@ $$
 
 with <u>linear regression</u> as a likelihood and <u>zero-mean Gaussian</u> prior.
 
-Let $\lambda\equiv\sigma^2/\tau^2$ be the <u>strength of the regularizer</u>, which is proportional to the strength of the prior $1/\tau^2$.
+Let $\lambda\equiv\sigma^2/\tau^2$ be the <u>strength of the regularizer</u>, which is proportional to the <u>strength of the prior</u> $1/\tau^2$.
 
 $$
 \begin{align*}
@@ -540,13 +540,17 @@ where $X_{c_0}$ is the centered matrix with $(x_n-\bar x_0)^T$ along its rows an
 >
 > Penalization of the intercept would make the procedure depend on the origin chosen for $y$; that is, adding a constant $c$ to each of the targets $y_n$ would not simply result in a shift of the predictions by the same amount $c$.
 
-If we <u>do not penalize</u> $w_0$, i.e., $\lambda_0=0$, then (eq. *) implies that
+If we <u>do not penalize</u> $w_0$, i.e., $\lambda_0=0$, then (eq. *) becomes
 
 $$
 \hat w = (X_c^TX_c+\lambda I_D)^{-1}X_c^T(y-\bar y1_N) \quad\text{and}\quad \hat w_0=\bar y-\hat w^T\bar x
 $$
 
-Let $y'=y+c1_N$. Then $\hat w$ is not changed by adding a constant vector $c1_N$ to the target $y$, since $y'-\bar y'1_N=y'-(\bar y+c)1_N=y-\bar y1_N$. It follows that $\hat y'-\hat y=\bar y'-\bar y=c$.
+Let $y'=y+c1_N$. Then $\hat w$ is not changed by adding a constant vector $c1_N$ to the target $y$, i.e., $\hat w'=\hat w$, since $y'-\bar y'1_N=y'-(\bar y+c)1_N=y-\bar y1_N$. It follows that
+
+$$
+\hat y'-\hat y=(\hat w'^Tx+\hat w_0')-(\hat w^Tx+\hat w_0)=\hat w_0'-\hat w_0=\bar y'-\bar y=c
+$$
 
 However, we cannot have the same result with nonzero $\lambda_0$.
 
@@ -779,19 +783,37 @@ This technique is a supervised version of PCA (see §20.1).
 
 ### 11.3.3 Choosing the strength of the regularizer
 
-To find the <u>optimal value</u> of $\lambda$, we can try a finite number of distinct values, and use cross validation to estimate their expected loss (see §4.5.5.2).
+#### Cross validation
+
+To find the <u>optimal value</u> of $\lambda$, we can try a finite number of distinct values, and use <u>cross validation</u> to estimate their expected loss (see §4.5.5.2).
+
+![](figure_4.5_abc.png)
+
+> Figure 4.5: (a-c) Ridge regression applied to a degree 14 polynomial fit to 21 data points.
 
 ![](figure_4.5_d.png)
 
-> Figure 4.5: (d) MSE vs. strength of regularizer $\lambda$. The degree of regularization increases from left to right, so model complexity decreases from left to right.
+> Figure 4.5: (d) MSE vs. strength of regularizer $\lambda$. The degree of regularization <u>increases</u> from left to right, so model complexity <u>decreases</u> from left to right. Here, 10 points of $\log_{10}\lambda$ are chosen evenly from -10 to 1.3, using `np.logspace(-10, 1.3, 10)`.
+
+
+
+#### Warm start
 
 This approach can be <u>quite expensive</u> if we have many values to choose from. Fortunately, we can often **warm start** the optimization procedure, using the value of $\hat w(\lambda_k)$ as an initializer for $\hat w(\lambda_{k+1})$, where $\lambda_{k+1}<\lambda_k$; in other words, we <u>start with a highly constrained model</u> (strong regularizer), and then <u>gradually relax the constraints</u> (decrease the amount of regularization). The set of parameters $\hat w_k$ that we sweep out in this way is known as the **regularization path** (see §11.4.4).
 
-We can also use an <u>empirical Bayes approach</u> to choose $\lambda$. In particular, we choose the hyperparameter by computing $\hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)$, where $p(\mathcal{D}|\lambda)$ is the marginal likelihood or evidence. Figure 4.7 (b) shows that this gives essentially the same result as the CV estimate.
+![](figure_11.10_a.png)
+
+> Figure 11.10: (a) Profiles of ridge coefficients for the prostate cancer example vs. bound $B$ on $\ell_2$ norm of $w$, so large $\lambda_k$ is on the left. The vertical line is the best value $\lambda$ chosen by the efficient <u>Leave-One-Out Cross-Validation</u>.
+
+
+
+#### Bayesian approach
+
+We can also use an <u>empirical Bayes approach</u> to choose $\lambda$. In particular, we choose the hyperparameter by computing $\hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)$, where $p(\mathcal{D}|\lambda)$ is the marginal likelihood or evidence. Figure 4.7 (b) shows that <u>this gives essentially the same result as the CV estimate</u>.
 
 ![](figure_4.7_b.png)
 
-> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The degree of regularization increases from left to right, so model complexity decreases from left to right.
+> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The <u>degree of regularization</u> increases from left to right, so <u>model complexity</u> decreases from left to right.
 >
 > (b) 5-fold cross-validation estimate of MSE; error bars are standard errors of the mean (in log scale). Vertical line is the point $\lambda$ chosen by the smallest MSE.
 
@@ -842,7 +864,7 @@ $$
 p(w|X,y,\sigma^2) \propto \mathcal{N}(w|\mathring w,\mathring\Sigma) \equiv \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma)
 $$
 
-where $\mathring w\equiv\mathring\Sigma \bigl( \frac{1}{\sigma^2}X^Ty+\breve\Sigma^{-1}\breve w \bigr)$ is the <u>posterior mean</u> and $\mathring\Sigma^{-1}\equiv\breve\Sigma^{-1}+\frac{1}{\sigma^2}X^TX$ is the <u>posterior covariance</u>.
+where $\mathring w\equiv\mathring\Sigma \bigl( \frac{1}{\sigma^2}X^Ty+\breve\Sigma^{-1}\breve w \bigr)$ is the <u>posterior mean</u> and $\mathring\Sigma\equiv\bigl(\breve\Sigma^{-1}+\frac{1}{\sigma^2}X^TX\bigr)^{-1}$ is the <u>posterior covariance</u>.
 
 - Since the posterior is Gaussian, its mode coincides with its mean $\mathring w$. For example, <u>in ridge regression</u> where $\breve w=0$, $\breve\Sigma=\tau^2I$, and $\lambda=\sigma^2/\tau^2$, we have
 
