@@ -470,7 +470,7 @@ $$
 
 **Ridge regression** can be derived as the <u>MAP estimation</u> of the posterior
 $$
-p(w|\mathcal{D},\sigma^2) \propto p(\mathcal{D}|w,\sigma^2)\,p(w) = \mathcal{N}(y|Xw,\sigma^2I)\,\mathcal{N}(w|0,\tau^2I)
+p(w|\mathcal{D}) \propto p(\mathcal{D}|w)\,p(w) = \mathcal{N}(y|Xw,\sigma^2I)\,\mathcal{N}(w|0,\tau^2I)
 $$
 
 with <u>linear regression</u> as a likelihood and <u>zero-mean Gaussian</u> prior.
@@ -514,8 +514,9 @@ $$
 
 > **Reference**: [Bis06, p.10]
 >
-> Note that often the coefficient $w_0$ is <u>omitted from the regularizer</u> because its inclusion causes the results to depend on the choice of origin for the target variable [HTF09, p.64], or it may be <u>included but with its own regularization coefficient</u> $\lambda_0$ [Bis06, §5.5.1].
+> - The coefficient $w_0$ is <u>omitted from the regularizer</u> because its inclusion causes the results to depend on the choice of origin for the target variable (see [HTF09, p.64]).
 >
+> - Or $w_0$ may be <u>included but with its own regularization coefficient</u> $\lambda_0$ (see [Bis06, §5.5.1]).
 
 Suppose that $w_0$ has its own regularization coefficient $\lambda_0$.
 
@@ -592,11 +593,13 @@ The argument `solver='auto'` selects the `sag` solver if `fit_intercept=True`. O
 > $$
 > \hat w_\text{map} = (X^TX+\lambda I_D)^{-1}X^Ty \tag{11.57}
 > $$
->
+
+
+
 > **Reference**: [HTF09, p.64]
 >
-> - Notice that with the choice of quadratic penalty $w^Tw$, the ridge regression solution $\hat w_\text{map}$ is again a linear function of $y$.
-> - The solution adds a positive constant $\lambda$ to the diagonal of $X^TX$ before inversion. This makes the problem nonsingular, even if $X^TX$ is <u>not of full rank</u>.
+> - The ridge regression solution $\hat w_\text{map}$ is again a <u>linear function</u> of $y$.
+> - The solution adds a positive constant $\lambda$ to the diagonal of $X^TX$ before inversion. This makes the problem <u>nonsingular</u>, even if $X^TX$ is <u>not of full rank</u>.
 > - It was the <u>main motivation</u> for ridge regression when it was first introduced in statistics (Hoerl and Kennard, 1970). Traditional descriptions of ridge regression start with definition (11.57).
 
 
@@ -605,7 +608,7 @@ The argument `solver='auto'` selects the `sag` solver if `fit_intercept=True`. O
 
 Naively computing $\hat w_\text{map}$ using matrix inversion is a bad idea, since it can be slow and numerically unstable.
 
-Suppose that the prior is $p(w)=\mathcal{N}(w|0,\Lambda^{-1})$, where $\Lambda$ is the precision matrix (symmetric and positive-definite). In the case of ridge regression, $\Lambda=\tau^{-2}I_D$.
+Suppose that the prior is $p(w)=\mathcal{N}(w|0,\Lambda^{-1})$, where $\Lambda$ is the precision matrix (symmetric and positive-definite).
 
 Let $\tilde X=\begin{pmatrix}X/\sigma \\ \sqrt{\Lambda}\end{pmatrix}$ and $\tilde y=\begin{pmatrix}y/\sigma \\ 0_D\end{pmatrix}$ where $\Lambda=\sqrt{\Lambda}\sqrt{\Lambda}^T$ is a <u>Cholesky decomposition</u>. Then the RSS on this expanded data is equivalent to <u>penalized</u> RSS on the original data:
 
@@ -617,7 +620,7 @@ f(w) &= (\tilde y-\tilde Xw)^T(\tilde y-\tilde Xw)
 \end{split}
 $$
 
-In the case of ridge regression, $f(w)=\frac{1}{\sigma^2}J(w)$ in (eq. 11.55). Hence the MAP estimate is given by
+In the case of ridge regression when $\Lambda=\tau^{-2}I_D$, we have $f(w)=\frac{1}{\sigma^2}J(w)$ in (eq. 11.55). Hence the MAP estimate is given by
 
 $$
 \hat w_\text{map}=(\tilde X^T\tilde X)^{-1}\tilde X^T\tilde y
@@ -712,49 +715,39 @@ In the case when $D\gg N$ (usual in ridge regression), it is faster to use SVD t
 > The SVD of the <u>centered</u> design matrix $X$ is another way of expressing the <u>principal components</u> of the variables in $X$.
 >
 > - The <u>sample covariance</u> matrix is given by $\Sigma = \frac{1}{N-1}X^TX=\frac{1}{N-1}VS^2V^T$, which is the eigen decomposition of $\Sigma$ (up to a factor ${N-1}$).
-> - The <u>first principal component</u> direction $v_1$ has the property that $z_1 = Xv_1=\sigma_1u_1\in\operatorname{Col}X\subseteq\mathbb{R}^N$ (projections of $x_n$'s onto $v_1$) has the <u>largest variance</u> $\frac{\sigma_1^2}{N}$ amongst all normalized linear combinations of the columns of $X$, since $\mathbb{V}[u_d]=\frac{1}{N}$.
+>
+> - The <u>first principal component</u> direction $v_1$ has the property that $z_1 = Xv_1=\sigma_1u_1\in\operatorname{Col}X\subseteq\mathbb{R}^N$ (projections of $x_n$'s onto $v_1$) has the <u>largest variance</u> $\frac{\sigma_1^2}{N}$ amongst all normalized linear combinations of the columns of $X$.
+>
+>   Note that $\mathbb{V}[u_d]=\frac{1}{N}\sum_n (u_{dn}-\mathbb{E}[u_d])^2=\frac{1}{N}$, since $X$ is centered so that $\mathbb{E}[u_d]=0$ and $u_d$ is orthonormal.
+>
 > - Subsequent principal components $z_d$ have maximum variance $\frac{\sigma_d^2}{N}$, subject to being orthogonal to the earlier ones. Conversely the <u>last principal component</u> has <u>minimum variance</u>.
+>
 > - Hence the <u>small singular values</u> $\sigma_d$ correspond to <u>directions</u> $u_d$ in the column space of $X$ <u>having small variance</u> $\frac{\sigma_d^2}{N}$, and ridge regression <u>shrinks these directions the most</u>.
 
 
 
-If $\sigma_n^2$ is <u>small</u> compared to $\lambda$, then the direction $u_n$ will <u>not have much effect</u> on the prediction. In view of this, we define the effective number of **degrees of freedom** of the model
+If $\sigma_d^2$ is <u>small</u> compared to $\lambda$, then the direction $u_d$ will <u>not have much effect</u> on the prediction. In view of this, we define the effective number of **degrees of freedom** of the model
 
 $$
-\operatorname{dof}(\lambda) = \sum_n \frac{\sigma_n^2}{\sigma_n^2+\lambda}
+\operatorname{dof}(\lambda) = \sum_d \frac{\sigma_d^2}{\sigma_d^2+\lambda}
 $$
 
-Since $\lambda\geq 0$, we have $0\leq\frac{\sigma_d^2}{\sigma_d^2+\lambda}\leq 1$. Note that $\operatorname{dof}(0)=N$ and $\operatorname{dof}(\lambda)\to0$ as $\lambda\to\infty$.
+Since $\lambda\geq 0$, we have $0\leq\frac{\sigma_d^2}{\sigma_d^2+\lambda}\leq 1$. Note that $\operatorname{dof}(0)=D$ and $\operatorname{dof}(\lambda)\to0$ as $\lambda\to\infty$.
 
 
 
 #### Why is this behavior desirable?
 
-The squared singular values $\sigma_d^2$ are equal to the eigenvalues of $X^TX$ so that <u>small singular values</u> $\sigma_d$ corresponds to directions $v_d$ with <u>high posterior variance</u>. It is these directions which ridge shrinks the most.
-
->  From §11.7.2, the <u>posterior covariance</u> of $p(w|\mathcal{D},\sigma^2)$ in ridge regression is
->
->  $$
->  \mathring\Sigma=\sigma^2(X^TX+\lambda I)^{-1} = \sigma^2V(S^2+\lambda I)^{-1}V^T
->  $$
->
-> Thus the direction in which we are <u>most uncertain</u> about $w$ is determined by the eigenvector $v_d\in\operatorname{Row}X\subseteq\mathbb{R}^D$ with the <u>largest eigenvalue</u> (high posterior variance) $\frac{1}{\sigma_d^2+\lambda}$ which corresponds to the <u>smallest singular value</u> $\sigma_d$.
-
 <img src="PRML_figure_3.15.png" style="zoom:50%;" />
 
 > Figure 3.15 [Bis06, p.170]: Contours of the likelihood function $p(\mathcal{D}|w,\sigma^2)$ (red) and the prior $p(w)$ (geen).
 >
-> - From §11.7.2, the posterior mean (or mode) of $p(w|\mathcal{D},\sigma^2)$ in ridge regression is
-> 
-> $$
-> \hat w_\text{map} = (X^TX+\lambda I)^{-1}X^Ty = \sum_d\Bigl(\frac{\sigma_d}{\sigma_d^2+\lambda}\Bigr)(u_d^Ty)v_d
-> $$
->
-> - In the direction $v_1$ (<u>ill-determined</u> by $\mathcal{D}$ with <u>high posterior variance</u>) the squared singular value $\sigma_1^2$ is <u>small</u> compared with $\lambda$ and so $\frac{\sigma_1^2}{\sigma_1^2+\lambda}$ is close to 0, and the projection of $\hat w_\text{map}$ onto $v_1$ is also 0. 
->
-> - By contrast, in the direction $v_2$ (<u>well-determined</u> by $\mathcal{D}$ with <u>low posterior variance</u>) the squared singular value $\sigma_2^2$ is <u>large</u> compared to $\lambda$ and so $\frac{\sigma_2^2}{\sigma_2^2+\lambda}$ is close to 1, and the projection of $\hat w_\text{map}$ onto $v_2$ is close to the projection of $\hat w_\text{mle}$ onto $v_2$.
+> - The <u>Hessian</u> of the (negative log) likelihood function is $H(w)=X^TX=VS^2V^T$ and $S^2=\operatorname{diag}(\sigma_1^2,\dotsc,\sigma_D^2)$ so that the eigenvalues $\sigma_d^2$ measure the <u>curvature of the likelihood function</u>.
+> - Since a <u>smaller curvature</u> corresponds to a <u>greater elongation of the contours</u> of the likelihood function, $\sigma_2^2$ is small compared with $\sigma_1^2$.
+> - For directions $v_1=w_2$ in which $\sigma_1^2\gg\lambda$, the corresponding parameter $\hat w_\text{map}=(X^TX+\lambda I)^{-1}X^Ty$ will be close to $\hat w_\text{mle}=(X^TX)^{-1}X^Ty$, and the ratio $\frac{\sigma_1^2}{\sigma_1^2+\lambda}$ will be close to 1. Such parameters are called **well-determined** because their values are tightly constrained by the data.
+> - For directions $v_2=w_1$ in which $\sigma_2^2\ll\lambda$, the corresponding parameter $\hat w_\text{map}$ will be close to 0, as will the ratio $\frac{\sigma_d^2}{\sigma_d^2+\lambda}$. These are directions in which the likelihood function is relatively insensitive to the parameter value and so the parameter has been set to a small value by the prior.
 
-In this way, ill-determined parameters are reduced in size towards 0. This is called **shrinkage**.
+In this way, <u>ill-determined parameters are reduced</u> in size towards 0. This is called **shrinkage**.
 
 
 
@@ -799,28 +792,15 @@ To find the <u>optimal value</u> of $\lambda$, we can try a finite number of dis
 
 #### Warm start
 
-This approach can be <u>quite expensive</u> if we have many values to choose from. Fortunately, we can often **warm start** the optimization procedure, using the value of $\hat w(\lambda_k)$ as an initializer for $\hat w(\lambda_{k+1})$, where $\lambda_{k+1}<\lambda_k$; in other words, we <u>start with a highly constrained model</u> (strong regularizer), and then <u>gradually relax the constraints</u> (decrease the amount of regularization). The set of parameters $\hat w_k$ that we sweep out in this way is known as the **regularization path** (see §11.4.4).
+Cross validation can be <u>quite expensive</u> if we have many values to choose from.
+
+We can often **warm start** the optimization procedure, using the value of $\hat w(\lambda_k)$ as an initializer for $\hat w(\lambda_{k+1})$, where $\lambda_{k+1}<\lambda_k$; in other words, we <u>start with a highly constrained model</u> (strong regularizer), and then <u>gradually relax the constraints</u> (decrease the amount of regularization).
+
+The set of parameters $\hat w_k$ that we sweep out in this way is known as the **regularization path** (see §11.4.4).
 
 ![](figure_11.10_a.png)
 
-> Figure 11.10: (a) Profiles of ridge coefficients for the prostate cancer example vs. bound $B$ on $\ell_2$ norm of $w$, so large $\lambda_k$ is on the left. The vertical line is the best value $\lambda$ chosen by the efficient <u>Leave-One-Out Cross-Validation</u>.
-
-
-
-#### Bayesian approach
-
-We can also use an <u>empirical Bayes approach</u> to choose $\lambda$. In particular, we choose the hyperparameter by computing $\hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)$, where $p(\mathcal{D}|\lambda)$ is the marginal likelihood or evidence. Figure 4.7 (b) shows that <u>this gives essentially the same result as the CV estimate</u>.
-
-![](figure_4.7_b.png)
-
-> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The <u>degree of regularization</u> increases from left to right, so <u>model complexity</u> decreases from left to right.
->
-> (b) 5-fold cross-validation estimate of MSE; error bars are standard errors of the mean (in log scale). Vertical line is the point $\lambda$ chosen by the smallest MSE.
-
-However, <u>the Bayesian approach has several advantages</u>.
-
-- Computing $p(\mathcal{D}|\lambda)$ can be done by fitting a single model, whereas CV has to fit the same model $K$ times.
-- $p(\mathcal{D}|\lambda)$ is a smooth function of $\lambda$, so we can use gradient based optimization instead of discrete search.
+> Figure 11.10: (a) Profiles of ridge coefficients for the prostate cancer example vs. bound $B$ on $\ell_2$ norm of $w$, so large $\lambda_k$ is on the left. The vertical line is the best value $\lambda=7.27895$ chosen by the efficient <u>Leave-One-Out Cross-Validation</u> with $N=97$.
 
 
 
@@ -831,22 +811,24 @@ However, <u>the Bayesian approach has several advantages</u>.
 
 > **Reference**: [Bis06, §3.3, p.152]
 >
-> In our discussion of <u>maximum likelihood</u> for setting the parameters of a linear regression model, we have seen that the <u>effective model complexity</u>, governed by the number of basis functions, <u>needs to be controlled according to the size of the data set</u>. Adding a <u>regularization term</u> to the log likelihood function means the effective model complexity can then be controlled by the value of the regularization coefficient, although the choice of the number and form of the basis functions is of course still important in determining the overall behavior of the model.
+> In <u>maximum likelihood estimation</u> of a linear regression model, the <u>effective model complexity</u>:
 >
-> This leaves the issue of deciding the appropriate model complexity for the particular problem, which <u>cannot be decided simply by maximizing the likelihood function</u>, because this always leads to excessively complex models and overfitting. <u>Independent hold-out (validation) data</u> can be used to determine model complexity, as discussed in Section 1.3, but this can be both computationally expensive and wasteful of valuable data.
+> - Needs to be controlled according to the <u>size of the data set</u> (to avoid overfitting).
+> - Can then be controlled by the value of the <u>regularization coefficient</u>.
 >
-> We therefore turn to a <u>Bayesian treatment of linear regression</u>, which will avoid the overfitting problem of maximum likelihood, and which will also lead to automatic methods of determining model complexity <u>using the training data alone</u>.
+> This leaves <u>the issue of deciding the appropriate model complexity</u> for the particular problem, which cannot be decided simply by maximizing the likelihood function.
+>
+> - <u>Independent hold-out (validation) data</u> can be used to determine model complexity, but this can be both computationally expensive and wasteful of valuable data.
+>
+> - A <u>Bayesian treatment of linear regression</u> will avoid the overfitting problem of maximum likelihood, and will also lead to automatic methods of determining model complexity <u>using the training data alone</u> (without cross-validation).
 
-For simplicity, we assume the variance $\sigma^2$ is a known constant, so we just want to compute the posterior
+For simplicity, we assume the noise variance $\sigma^2$ is a known constant, so we just want to compute the posterior $p(w|\mathcal{D};\sigma^2)\propto p(\mathcal{D}|w;\sigma^2)p(w)$.
 
-$$
-p(w|\mathcal{D},\sigma^2) \propto p(\mathcal{D}|w,\sigma^2)\,p(w)
-$$
 
 
 ### 11.7.1 Priors
 
-We will use a <u>Gaussian prior</u>, $p(w)=\mathcal{N}(w|\breve w,\breve\Sigma)$. In ridge regression, $\breve w=0$ and $\breve\Sigma=\tau^2I$.
+We will use a <u>Gaussian prior</u>, $p(w)=\mathcal{N}(w|\breve w,\breve\Sigma)$. For example, $\breve w=0$ and $\breve\Sigma=\tau^2I_D$ in ridge regression.
 
 
 
@@ -855,45 +837,59 @@ We will use a <u>Gaussian prior</u>, $p(w)=\mathcal{N}(w|\breve w,\breve\Sigma)$
 We can rewrite the <u>likelihood</u> in terms of an MVN
 
 $$
-p(\mathcal{D}|w,\sigma^2) = \prod_n p(y_n|x_n;w,\sigma^2) = \mathcal{N}(y|Xw,\sigma^2I_N)
+p(\mathcal{D}|w;\sigma^2) = \prod_n p(y_n|w^Tx_n,\sigma^2) = \mathcal{N}(y|Xw,\sigma^2I_N)
 $$
 
-From the Bayes rule for Gaussian (eq. 3.37) the <u>posterior</u> is
+From §3.3.1 **Bayes rule for Gaussians**, the <u>posterior</u> is given by
 
 $$
-p(w|X,y,\sigma^2) \propto \mathcal{N}(w|\mathring w,\mathring\Sigma) \equiv \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma)
+p(w|y;X,\sigma^2) \equiv \mathcal{N}(w|\tilde w,\tilde\Sigma) \propto \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma) \tag{3.37}
 $$
 
-where $\mathring w\equiv\mathring\Sigma \bigl( \frac{1}{\sigma^2}X^Ty+\breve\Sigma^{-1}\breve w \bigr)$ is the <u>posterior mean</u> and $\mathring\Sigma\equiv\bigl(\breve\Sigma^{-1}+\frac{1}{\sigma^2}X^TX\bigr)^{-1}$ is the <u>posterior covariance</u>.
+where the inverse of the <u>posterior covariance</u> $\tilde\Sigma^{-1}\equiv\breve\Sigma^{-1}+\frac{1}{\sigma^2}X^TX$, and the <u>posterior mean</u> $\tilde w\equiv\tilde\Sigma \bigl( \frac{1}{\sigma^2}X^Ty+\breve\Sigma^{-1}\breve w \bigr)$.
 
-- Since the posterior is Gaussian, its mode coincides with its mean $\mathring w$. For example, <u>in ridge regression</u> where $\breve w=0$, $\breve\Sigma=\tau^2I$, and $\lambda=\sigma^2/\tau^2$, we have
+- Since the posterior is Gaussian, its mode $\hat w_\text{map}$ coincides with its mean $\tilde w$.
+
+- For example, $\breve w=0$, $\breve\Sigma=\tau^2I$, and $\lambda=\sigma^2/\tau^2$ <u>in ridge regression</u> so that
 
   $$
   \begin{gather*}
-  \mathring\Sigma^{-1} = \frac{1}{\tau^2}I + \frac{1}{\sigma^2}X^TX =   \frac{1}{\sigma^2}(X^TX+\lambda I) \\
-  \mathring w = \sigma^2(X^TX+\lambda I)^{-1}\Bigl(\frac{1}{\sigma^2}X^Ty+0\Bigr)=(X^TX+\lambda I)^{-1}X^Ty
+  \tilde\Sigma^{-1} = \tfrac{1}{\tau^2}I + \tfrac{1}{\sigma^2}X^TX = \tfrac{1}{\sigma^2}(X^TX+\lambda I) \\
+  \tilde w = \sigma^2(X^TX+\lambda I)^{-1}\Bigl(\tfrac{1}{\sigma^2}X^Ty+0\Bigr)=(X^TX+\lambda I)^{-1}X^Ty
   \end{gather*}
   $$
   
-  Thus the ridge regression estimate $\hat w_\text{map}$ (eq. 11.57) can be derived as the mean or mode of a posterior distribution. 
+- In particular, if $\tau^2\to\infty$ (infinitely broad prior in ridge regression), the <u>posterior mean</u> $\tilde w=\hat w_\text{mle}=(X^TX)^{-1}X^Ty$ (eq. 11.9), and the inverse of the <u>posterior covariance</u> $\tilde\Sigma^{-1}=\frac{1}{\sigma^2}X^TX$.
 
 
-- If we consider an infinitely broad prior $\breve\Sigma=\tau^2I$ with $\tau^2\to\infty$ <u>in ridge regression</u>, the <u>posterior mean</u> reduces to the MLE estimate $\hat w_\text{mle}=(X^TX)^{-1}X^Ty$ (eq. 11.9), and the <u>posterior covariance</u> reduces to $\frac{1}{\sigma^2}(X^TX)^{-1}$.
 - If $N=0$, then the posterior reverts to the prior.
+
+Furthermore, the <u>normalization constant</u> of the posterior (<u>marginal likelihood</u> or <u>model evidence</u>) is given by
+
+$$
+p(y) = \int \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma)\,dw = \mathcal{N}(y|X\breve w,\sigma^2I_N+X\breve\Sigma X^T) \tag{3.38}
+$$
+
+In <u>ridge regression</u>, we have a Gaussian $p(y)$ with the zero mean and the the covariance $\tau^2(XX^T+\lambda I_N)$.
 
 
 
 ### 11.7.3 Example
 
-> **Reference**: [Bis06, §3.3, p.154]
+> **Reference**: [Bis06, §3.3.1, p.154-155]
 >
 > We can illustrate Bayesian learning in a linear model, as well as the <u>sequential update of a posterior distribution</u>, using a simple example involving straight line fitting.
 >
 > **Linear model** of the form $y=f(x,w)=w_0+w_1x$, where the true parameters are $w_0=-0.3$ and $w_1=0.5$. 
 >
-> **Synthetic data**: (1) Choose $x_n\sim\mathcal{U}(-1,1)$ from the uniform distribution. (2) Evaluate $y_n=f(x_n,w)+\epsilon_n$, where $\epsilon_n\sim\mathcal{N}(0,\sigma^2)$ is a Gaussian noise with $\sigma=0.2$.
+> **Synthetic data**:
 >
-> Our goal is to recover the values of $w_0$ and $w_1$ from such data, and we will explore the dependence on the size $N$ of the data set. We assume that the noise variance $\sigma^2=(0.2)^2$ and $\tau^2=1/2$ so that $\lambda=\sigma^2/\tau^2=2(0.2)^2=0.08$.
+> 1. Choose $x_n\sim\mathcal{U}(-1,1)$ from the uniform distribution.
+> 2. Evaluate $y_n=f(x_n,w)+\epsilon_n$, where $\epsilon_n\sim\mathcal{N}(0,\sigma^2)$ is a Gaussian noise with $\sigma=0.2$.
+>
+> Our goal is to recover the values of $w_0$ and $w_1$ from such data, and we will explore the dependence on the size $N$ of the data set.
+>
+> We assume that the noise variance $\sigma^2=(0.2)^2$ and $\tau^2=1/2$ so that $\lambda=\sigma^2/\tau^2=2(0.2)^2=0.08$.
 
 ![](figure_11.20.png)
 
@@ -920,9 +916,120 @@ where $\mathring w\equiv\mathring\Sigma \bigl( \frac{1}{\sigma^2}X^Ty+\breve\Sig
 
 
 
+### Maximal likelihood or model evidence
+
+In ridge regression, the <u>normalization constant of the posterior</u> is given by
+$$
+p(\mathcal{D}) = \mathcal{N}(y|0,\tau^2XX^T+\sigma^2 I_N) = \mathcal{N}(y|0,\tau^2(XX^T+\lambda I_N)) \tag{3.38}
+$$
+
+
+
+#### The evidence approximation: Empirical Bayes
+
+> **Reference**: [Bis06, §3.5.1, p.166-169]
+>
+> The marginal likelihood (or model evidence) function is obtained by integrating over $w$, so that in ridge regression
+>
+> $$
+> \begin{align*}
+> p(y|X,\sigma^2,\tau^2) &= \int \mathcal{N}(y|Xw,\sigma^2)\mathcal{N}(w|0,\tau^2)\,dw \\
+> &= \frac{1}{\sqrt{(2\pi\sigma^2)^N}} \frac{1}{\sqrt{(2\pi\tau^2)^D}} \int\exp\bigl[-\tfrac{1}{2}E(w)\bigr]\,dw
+> \end{align*}
+> $$
+>
+> where $E(w)\equiv\frac{1}{\sigma^2}(y-Xw)^T(y-Xw)+\frac{1}{\tau^2}w^Tw$.
+>
+> Recall that $\tilde\Sigma^{-1}=\frac{1}{\sigma^2}X^TX+\frac{1}{\tau^2}I_D$ and $\tilde w=\frac{1}{\sigma^2}\tilde\Sigma X^Ty$. Thus we have
+>
+> $$
+> E(w) = E(\tilde w)+(w-\tilde w)^T\tilde\Sigma^{-1}(w-\tilde w)
+> $$
+>
+> *Proof.* Using $\tilde w^T\tilde\Sigma^{-1}=\frac{1}{\sigma^2}y^TX$, it follows that
+> $$
+> \begin{align*}
+> E(w) &= \frac{1}{\sigma^2}(y-Xw)^T(y-Xw)+\frac{1}{\tau^2}w^Tw \\
+> &= \frac{1}{\sigma^2}y^Ty-\frac{2}{\sigma^2}y^TXw+w^T\tilde\Sigma^{-1}w
+> = \frac{1}{\sigma^2}y^Ty-2\tilde w^T\tilde\Sigma^{-1}w+w^T\tilde\Sigma^{-1}w \\
+> &= \frac{1}{\sigma^2}y^Ty-\tilde w^T\tilde\Sigma^{-1}\tilde w + (w-\tilde w)\tilde\Sigma^{-1}(w-\tilde w) \\
+> &= \frac{1}{\sigma^2}y^Ty-\frac{2}{\sigma^2}y^TX\tilde w + \frac{1}{\sigma^2}y^TX\tilde w + (w-\tilde w)\tilde\Sigma^{-1}(w-\tilde w) \\
+> &= \frac{1}{\sigma^2}y^Ty-\frac{2}{\sigma^2}y^TX\tilde w + \tilde w^T\tilde\Sigma^{-1}\tilde w + (w-\tilde w)\tilde\Sigma^{-1}(w-\tilde w) \\
+> &= E(\tilde w) + (w-\tilde w)^T\tilde\Sigma^{-1}(w-\tilde w)
+> \end{align*}
+> $$
+>
+> The integral over $w$ can now be evaluated simply by appealing to the standard result for the normalization coefficient of a MVN, giving
+>
+> $$
+> \begin{align*}
+> \int\exp\bigl[-\tfrac{1}{2}E(w)\bigr]\,dw &= \exp\bigl[-\tfrac{1}{2}E(\tilde w)\bigr] \int\exp\bigl[-\tfrac{1}{2}(w-\tilde w)^T\tilde\Sigma^{-1}(w-\tilde w)\bigr]\,dw \\
+> &= \exp\bigl[-\tfrac{1}{2}E(\tilde w)\bigr] (2\pi)^\frac{D}{2}|\tilde\Sigma|^\frac{1}{2}
+> \end{align*}
+> $$
+>
+> We can then write the log of the marginal likelihood in the form
+>
+> $$
+> \begin{align*}
+> \log p(y|X,\sigma^2,\tau^2) &= -\frac{N}{2}\log(2\pi\sigma^2)-\frac{D}{2}\log(2\pi\tau^2)-\frac{1}{2}E(\tilde w)+\frac{D}{2}\log(2\pi)+\frac{1}{2}\log|\tilde\Sigma| \\
+> &= -N\log\sigma-D\log\tau-\frac{1}{2}E(\tilde w)-\frac{N}{2}\log(2\pi)+\frac{1}{2}\log|\tilde\Sigma| \\
+> &= -N\log\sigma+\frac{D}{2}\log\lambda-\frac{1}{2}E(\tilde w)-\frac{N}{2}\log(2\pi)-\frac{1}{2}\sum_d\log(\sigma_d^2+\lambda)
+> \end{align*}
+> $$
+>
+> since $\log\tau=\log\sigma-\frac{1}{2}\log\lambda$  and $\log|\tilde\Sigma|=2D\log\sigma-\sum_d\log(\sigma_d^2+\lambda)$. Thus
+>
+> $$
+> \frac{\partial}{\partial\lambda}\log p(y|X,\sigma^2,\tau^2) = \frac{D}{2\lambda}-\frac{1}{2\sigma^2}\tilde w^T\tilde w-\frac{1}{2}\sum_d\frac{1}{\sigma_d^2+\lambda} = 0
+> $$
+>
+> implies that
+>
+> $$
+> \frac{\lambda}{\sigma^2}\tilde w^T\tilde w = D - \sum_d\frac{\lambda}{\sigma_d^2+\lambda} = \sum_d\Bigl(1-\frac{\lambda}{\sigma_d^2+\lambda}\Bigr) = \sum_d\frac{\sigma_d^2}{\sigma_d^2+\lambda} = \operatorname{dof}(\lambda)
+> $$
+>
+> - The value of $\lambda$ that <u>maximize the marginal likelihood</u> (or model evidence) satisfies
+> 
+>   $$
+>   \lambda = \sigma^2\dfrac{\operatorname{dof}(\lambda)}{\tilde w^T\tilde w}
+>   $$
+>
+> - This is an <u>implicit solution</u> for $\lambda$ not only because $\operatorname{dof}(\lambda)$ depends on $\lambda$, but also because $\tilde w=(X^TX+\lambda I_D)^{-1}X^Ty$ depends on $\lambda$.
+>
+> - We can adopt an <u>iterative procedure</u> in which we make an initial choice for $\lambda$ and use this to find $\tilde w$, and also to evaluate $\operatorname{dof}(\lambda)$. These values are then used to re-estimate $\lambda$, and the process repeated until convergence.
+>
+> - Note that because $X^TX$ is fixed, we can compute its eigenvalues $\sigma_d^2$ once at the start.
+
+
+
+#### Bayesian approach for choosing the strength of the regularizer
+
+We can also use an <u>empirical Bayes approach</u> to choose $\lambda$. In particular, we choose the hyperparameter by computing
+$$
+\hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)
+$$
+Figure 4.7 (b) shows that <u>this gives essentially the same result as the CV estimate</u>.
+
+![](figure_4.7_b.png)
+
+> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The <u>degree of regularization</u> increases from left to right, so <u>model complexity</u> decreases from left to right.
+>
+> (b) 5-fold cross-validation estimate of MSE; error bars are standard errors of the mean (in log scale). Vertical line is the point $\lambda$ chosen by the smallest MSE.
+
+However, <u>the Bayesian approach has several advantages</u>.
+
+- Computing $p(\mathcal{D}|\lambda)$ can be done by fitting a single model, whereas CV has to fit the same model $K$ times.
+- $p(\mathcal{D}|\lambda)$ is a smooth function of $\lambda$, so we can use gradient based optimization instead of discrete search.
+
+
+
 ### 11.7.4 Computing the posterior predictive
 
-We have discussed how to compute our uncertainty about the parameters of the model, $p(w|\mathcal{D})$. But what about the uncertainty associated with our predictions about future outputs?
+> **Reference**: [Bis06, §3.3.2, p.156-158]
+
+We have discussed how to compute our uncertainty about the parameters of the model, $p(w|\mathcal{D})$. But what about the <u>uncertainty associated with our predictions</u> about future outputs?
 
 From (eq. 3.38) we can show that the <u>posterior predictive distribution</u> at a test point $x$ is also Gaussian.
 
@@ -933,7 +1040,15 @@ p(y|x,\mathcal{D}) &= \int p(y|x;w)p(w|\mathcal{D})\,dw = \int\mathcal{N}(y|w^Tx
 \end{split}
 $$
 
-where $\mathring\sigma_N^2(x)\equiv\sigma^2+x^T\mathring\Sigma x$ is the <u>variance of the posterior predictive distribution</u> at the point $x$ after seeing the $N$ training examples $\mathcal{D}$. The predicted variance depends on two terms, the variance of the observation noise $\sigma^2$, and the variance $\mathring\Sigma$. The latter translates into <u>variance about observations in a way which depends on how close $x$ is to the training data</u> $\mathcal{D}$. This is illustrated in Figure 11.21 (b).
+where $\mathring\sigma_N^2(x)\equiv\sigma^2I_N+x^T\mathring\Sigma x$ is the <u>variance of the posterior predictive distribution</u> at the point $x$ after seeing the $N$ training examples $\mathcal{D}$. The predicted variance depends on two terms, the <u>variance of the observation noise</u> $\sigma^2$, and the variance $\mathring\Sigma$ (which reflects the <u>uncertainty associated with</u> $w$).
+
+> **Reference**: [Bis06, p.156]
+>
+> Note that, as additional data points are observed, the posterior distribution becomes narrower.
+>
+> As a consequence it can be shown (Qazaz et al., 1997) that $\mathring\sigma_{N+1}^2(x)\leq\mathring\sigma_N^2(x)$. In the limit $N\to\infty$, the second term $x^T\mathring\Sigma x$ goes to zero, and the variance of the predictive distribution arises solely from the additive noise governed by the parameter $\sigma^2$.
+
+The latter translates into <u>variance about observations in a way which depends on how close $x$ is to the training data</u> $\mathcal{D}$. This is illustrated in Figure 11.21 (b).
 
 ![](figure_11.21_ab.png)
 

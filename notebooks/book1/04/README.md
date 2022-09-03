@@ -11,7 +11,7 @@
 | 4.4 | [shrinkcov_plots.ipynb](shrinkcov_plots.ipynb) | - |
 | 4.5 | [linreg_poly_ridge.ipynb](linreg_poly_ridge.ipynb) | - |
 | 4.6 | - | [Figure_4.6.png](https://github.com/probml/pml-book/blob/main/book1-figures/Figure_4.6.png)<br/> |
-| 4.7 | [polyfitRidgeCV.ipynb](polyfitRidgeCV.ipynb) | - |
+| 4.7 | [linreg_poly_ridge.ipynb](linreg_poly_ridge.ipynb) | - |
 | 4.8 | [imdb_mlp_bow_tf.ipynb](imdb_mlp_bow_tf.ipynb) | - |
 | 4.9 | [linreg_poly_vs_n.ipynb](linreg_poly_vs_n.ipynb) | - |
 | 4.10 | [beta_binom_post_plot.ipynb](beta_binom_post_plot.ipynb) | - |
