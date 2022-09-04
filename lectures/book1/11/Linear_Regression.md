@@ -991,7 +991,7 @@ $$
 > $$
 >
 > - The value of $\lambda$ that <u>maximize the marginal likelihood</u> (or model evidence) satisfies
-> 
+>
 >   $$
 >   \lambda = \sigma^2\dfrac{\operatorname{dof}(\lambda)}{\tilde w^T\tilde w}
 >   $$
@@ -1001,6 +1001,8 @@ $$
 > - We can adopt an <u>iterative procedure</u> in which we make an initial choice for $\lambda$ and use this to find $\tilde w$, and also to evaluate $\operatorname{dof}(\lambda)$. These values are then used to re-estimate $\lambda$, and the process repeated until convergence.
 >
 > - Note that because $X^TX$ is fixed, we can compute its eigenvalues $\sigma_d^2$ once at the start.
+>
+> It should be emphasized that the value of $\lambda$ has been determined purely by <u>looking at the training data</u>. In contrast to maximum likelihood methods, <u>no independent data set is required</u> in order to optimize the model complexity.
 
 
 
@@ -1016,12 +1018,12 @@ Figure 4.7 (b) shows that <u>this gives essentially the same result as the CV es
 
 > Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The <u>degree of regularization</u> increases from left to right, so <u>model complexity</u> decreases from left to right.
 >
-> (b) 5-fold cross-validation estimate of MSE; error bars are standard errors of the mean (in log scale). Vertical line is the point $\lambda$ chosen by the smallest MSE.
+> (b) 5-fold cross-validation estimate of MSE; error bars are standard errors $\frac{\sigma}{\sqrt{N}}$ of the mean (in log scale). The blue vertical line is the point $\lambda$ chosen by the smallest MSE, and the red one is the estimation $\hat\lambda$ by empirical Bayes.
 
 However, <u>the Bayesian approach has several advantages</u>.
 
-- Computing $p(\mathcal{D}|\lambda)$ can be done by fitting a single model, whereas CV has to fit the same model $K$ times.
-- $p(\mathcal{D}|\lambda)$ is a smooth function of $\lambda$, so we can use gradient based optimization instead of discrete search.
+- Computing $p(\mathcal{D}|\lambda)$ can be done by fitting a single model, whereas CV has to fit the same model $K=5$ times.
+- $p(\mathcal{D}|\lambda)$ is a smooth function of $\lambda$, so we can use <u>gradient based optimization</u>(?) instead of discrete search.
 
 
 
