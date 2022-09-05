@@ -484,7 +484,7 @@ $$
 \operatorname{NLL}(W) = -\frac{1}{N}\log\prod_n\prod_c \mu_{nc}^{y_{nc}} = -\frac{1}{N}\sum_n\sum_c y_{nc}\log\mu_{nc} = \frac{1}{N}\sum_n\mathbb{H}(y_n,\mu_n) \tag{10.58}
 $$
 
-where $\mu_{nc}\equiv p(y_{nc}=1|x_n;\theta)=S(Wx_n)_c$, and $y_n$ is represented by the one-hot encoding, i.e., $y_{nc}=\mathbb{I}(y_n=c)$ and $\sum_c y_{nc}=1$, and $\mathbb{H}(p,q)\equiv -\sum_c p_c\log q_c$ is the **cross-entropy**. 
+where $\mu_{nc}\equiv p(y_{nc}=1|x_n;\theta)={S(Wx_n)}_c$, and $y_n$ is represented by the one-hot encoding, i.e., $y_{nc}=\mathbb{I}(y_n=c)$ and $\sum_c y_{nc}=1$, and $\mathbb{H}(p,q)\equiv -\sum_c p_c\log q_c$ is the **cross-entropy**. 
 
 
 
@@ -496,7 +496,7 @@ To find the optimum, we need to solve $\nabla_W\operatorname{NLL}(W)=0$.
 
 #### 10.3.2.3 Deriving the gradient
 
-Since $\mu_c=S(Wx)_c=S(a)_c=\dfrac{e^{a_c}}{\sum_je^{a_j}}$, we have $\dfrac{\partial\mu_c}{\partial a_j}=\mu_c(\delta_{cj}-\mu_j)$, where $\delta_{cj}=\mathbb{I}(c=j)$.
+Since $\mu_c={S(Wx)}_c=S(a)_c=\dfrac{e^{a_c}}{\sum_je^{a_j}}$, we have $\dfrac{\partial\mu_c}{\partial a_j}=\mu_c(\delta_{cj}-\mu_j)$, where $\delta_{cj}=\mathbb{I}(c=j)$.
 
 Let $\operatorname{NLL_n(W)}=-\sum_c y_{nc}\log\mu_{nc}$ denote the NLL for a single sample $(x_n, y_n)$. Since the entry $w_{jk}$ in $W$ is associated with class $j$, the gradient of $\operatorname{NLL}_n(W)$ is given by the $C\times D$ matrix
 
@@ -703,9 +703,9 @@ Maxent classifiers are very widely used in NLP. For example, consider the proble
 
 $$
 \begin{split}
-\phi_1(x,y) &= \mathbb{I}(y=\text{person $\and$ $x$ occcurs after Mr. or Mrs.}) \\
-\phi_2(x,y) &= \mathbb{I}(y=\text{person $\and$ $x$ is in whitelist of common names}) \\
-\phi_3(x,y) &= \mathbb{I}(y=\text{place $\and$ $x$ is in Google maps}) \\
+\phi_1(x,y) &= \mathbb{I}(y=\text{person $\land$ $x$ occcurs after Mr. or Mrs.}) \\
+\phi_2(x,y) &= \mathbb{I}(y=\text{person $\land$ $x$ is in whitelist of common names}) \\
+\phi_3(x,y) &= \mathbb{I}(y=\text{place $\land$ $x$ is in Google maps}) \\
 &\vdots
 \end{split}
 $$
@@ -938,7 +938,7 @@ Since $\log_{t_1}x$ is <u>bounded below</u> by $\frac{-1}{1-{t_1}}$, and hence $
 
 ![](figure_10.11.png)
 
-> Figure 10.11: (a) Illustration of log loss ($t_1,t_2\to 1$) and tempered cross entropy loss with fixed $t_1=0.8$. It is bounded above by $\frac{1}{1-t_1}=5$. (b) Illustration of sigmoid ($t_2\to 1$) and tempered softmax.
+> Figure 10.11: (a) Illustration of log loss $(t_1,t_2\to 1)$ and tempered cross entropy loss with fixed $t_1=0.8$. It is bounded above by $\frac{1}{1-t_1}=5$. (b) Illustration of sigmoid $(t_2\to 1)$ and tempered softmax.
 >
 > In both plots, activation $a=(a_1,a_2)$ is given according to $a_2$ with fixed $a_1=0$. Then the tempered softmax becomes the sigmoid as $t_2\to 1$.
 
@@ -946,7 +946,7 @@ Since $\log_{t_1}x$ is <u>bounded below</u> by $\frac{-1}{1-{t_1}}$, and hence $
 
 #### Mislabeled examples nearby can stretch the decision boundary.
 
-> **Reference**: N. Ding and S. Vishwanathan, *$t$-logistic regression*, NIPS 2010.
+> **Reference**: N. Ding and S. Vishwanathan, *t-logistic regression*, NIPS 2010.
 >
 > Another issue arises due to the <u>exponentially decaying tail</u> of the softmax function.
 >
@@ -1001,15 +1001,15 @@ Note that $\lambda_t(a)$ does not have a closed form solution in general, and mu
 > 
 > where $Z(a)\equiv\sum_c\exp_t(a_c)\in\mathbb{R}$ and $\mu\equiv\max_c\{a_c\}$.
 >
-> (1) We assert that $0<Z(\tilde a_{k})^{1-t}<1$ and $(\tilde a_k)_c\leq 0$ for all $k$.
+> (1) We assert that $0<Z(\tilde a_k)^{1-t}<1$ and $(\tilde a_k)_c\leq 0$ for all $k$.
 >
-> > ($\because$) Notice that if $a_{c_0}=\mu$ for some $c_0$, then $(\tilde a_k)_{c_0}=0$ for all $k$ so that there is at least one $c$ such that $(\tilde a_k)_c=0$ for all $k$. Since $C\geq 2$, we have $Z(\tilde a_{k})=\sum_c\exp_t((\tilde a_k)_c)>1$ so that $0<Z(\tilde a_{k})^{1-t}<1$ for all $k$. It follows that $(\tilde a_{k+1})_c=Z(\tilde a_k)^{1-t}(\tilde a_0)_c\leq 0$ for all $k$, since $(\tilde a_0)_c\leq 0$, for all $c$.
+> > ($\because$) Notice that if $a_{c_0}=\mu$ for some $c_0$, then ${(\tilde a_k)}_{c_0}=0$ for all $k$ so that there is at least one $c$ such that ${(\tilde a_k)}_c=0$ for all $k$. Since $C\geq 2$, we have $Z(\tilde a_k)=\sum_c\exp_t{(\tilde a_k)}_c>1$ so that $0<Z(\tilde a_k)^{1-t}<1$ for all $k$. It follows that ${(\tilde a_{k+1})}_c=Z(\tilde a_k)^{1-t}{(\tilde a_0)}_c\leq 0$ for all $k$, since ${(\tilde a_0)}_c\leq 0$, for all $c$.
 >
-> (2) We assert that $(\tilde a_k)_c$ is monotonically increasing for all $c$.
+> (2) We assert that ${(\tilde a_k)}_c$ is monotonically increasing for all $c$.
 >
-> > ($\because$) It is trivial that $(\tilde a_0)_c\leq Z(\tilde a_0)^{1-t}(\tilde a_0)_c=(\tilde a_1)_c$ for all $c$. Suppose $(\tilde a_{k-1})_c\leq(\tilde a_k)_c$ for all $c$. Then $Z(\tilde a_{k-1})=\sum_c\exp_t[(\tilde a_{k-1})_c]\leq\sum_c\exp_t[(\tilde a_k)_c]=Z(\tilde a_k)$. It follows that $(\tilde a_k)_c=Z(\tilde a_{k-1})^{1-t}(\tilde a_0)_c\leq Z(\tilde a_k)^{1-t}(\tilde a_0)_c=(\tilde a_{k+1})_c$ for all $c$.
+> > ($\because$) It is trivial that ${(\tilde a_0)}_c\leq Z(\tilde a_0)^{1-t}{(\tilde a_0)}_c={(\tilde a_1)}_c$ for all $c$. Suppose ${(\tilde a_{k-1})}_c\leq{(\tilde a_k)}_c$ for all $c$. Then $Z(\tilde a_{k-1})=\sum_c\exp_t{(\tilde a_{k-1})}_c\leq\sum_c\exp_t{(\tilde a_k)_c}=Z(\tilde a_k)$. It follows that ${(\tilde a_k)}_c=Z(\tilde a_{k-1})^{1-t}{(\tilde a_0)}_c\leq Z(\tilde a_k)^{1-t}{(\tilde a_0)}_c={(\tilde a_{k+1})}_c$ for all $c$.
 >
-> Thus, the limit $\tilde a_c\equiv\lim_{k\to\infty}(\tilde a_k)_c$ exists for all $c$, in other words, we can define $\tilde a\equiv\lim_{k\to\infty}\tilde a_k$. Since $Z$ is continuous, we have
+> Thus, the limit $\tilde a_c\equiv\lim_{k\to\infty}{(\tilde a_k)}_c$ exists for all $c$, in other words, we can define $\tilde a\equiv\lim_{k\to\infty}\tilde a_k$. Since $Z$ is continuous, we have
 > 
 > $$
 > \tilde a=\lim_{k\to\infty}\tilde a_{k+1}=\lim_{k\to\infty}\bigl[Z(\tilde a_k)^{1-t}\tilde a_0\bigr]=Z\Bigl(\lim_{k\to\infty}\tilde a_k\Bigr)^{1-t}\tilde a_0=Z(\tilde a)^{1-t}\tilde a_0
@@ -1239,7 +1239,7 @@ Multinomial probit or multivariate probit (Check!)
 >    - **Binary classification**: $a\mapsto\mu=\sigma(a)\in\mathbb{R}\mapsto\operatorname{Ber}(y|\mu)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\mathbb{H}(y_n,\mu_n)$
 >    - **Multi-class classification**: $[a_c]\mapsto\mu=S([a_c])\in\mathbb{R}^C\mapsto\operatorname{Cat}(y|\mu)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\mathbb{H}(y_n,\mu_n)$
 >    - **Multi-label classification**: $[a_c]\mapsto[\mu_c=\sigma(a_c)]\in\mathbb{R}^C\mapsto\prod_c\operatorname{Ber}(y|\mu_c)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\sum_c\mathbb{H}(y_{nc},\mu_{nc})$
->    - **Multi-class multi-output classification**: $[a_{tc}]\mapsto [\mu_t=S([a_{tc}]_c)]_t\in\mathbb{R}^{TC}\mapsto\prod_t\operatorname{Cat}(y_t|\mu_t)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\sum_t\mathbb{H}(y_{nt},\mu_{nt})$
+>    - **Multi-class multi-output classification**: $[a_{tc}]\mapsto {[\mu_t=S({[a_{tc}]}_c)]}_t\in\mathbb{R}^{TC}\mapsto\prod_t\operatorname{Cat}(y_t|\mu_t)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\sum_t\mathbb{H}(y_{nt},\mu_{nt})$
 
 
 
