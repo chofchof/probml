@@ -496,7 +496,7 @@ To find the optimum, we need to solve $\nabla_W\operatorname{NLL}(W)=0$.
 
 #### 10.3.2.3 Deriving the gradient
 
-Since $\mu_c={S(Wx)}_c=S(a)_c=\dfrac{e^{a_c}}{\sum_je^{a_j}}$, we have $\dfrac{\partial\mu_c}{\partial a_j}=\mu_c(\delta_{cj}-\mu_j)$, where $\delta_{cj}=\mathbb{I}(c=j)$.
+Since $\mu_c=S\lparen Wx\rparen_c=S(a)_c=\dfrac{e^{a_c}}{\sum_je^{a_j}}$, we have $\dfrac{\partial\mu_c}{\partial a_j}=\mu_c(\delta_{cj}-\mu_j)$, where $\delta_{cj}=\mathbb{I}(c=j)$.
 
 Let $\operatorname{NLL_n(W)}=-\sum_c y_{nc}\log\mu_{nc}$ denote the NLL for a single sample $(x_n, y_n)$. Since the entry $w_{jk}$ in $W$ is associated with class $j$, the gradient of $\operatorname{NLL}_n(W)$ is given by the $C\times D$ matrix
 
