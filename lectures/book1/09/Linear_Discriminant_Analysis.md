@@ -89,7 +89,7 @@ $$
 $$
 
 - `clf.scalings_`: eigenvalues of $\hat\Sigma_c$, that is $\frac{S^2}{N_c-1}$ of shape $(D,)$
-- `clf.rotations_`: eigenvectors of $\hat\Sigma_c$, that is $V$of shape $(D,D)$
+- `clf.rotations_`: eigenvectors of $\hat\Sigma_c$, that is $V$ of shape $(D,D)$
 
 Note that `reg_param` $0\leq\lambda\leq1$ controls `clf.scalings_` using $(1-\lambda)\frac{S^2}{N_c-1}+\lambda$, i.e., $\hat\Sigma_c$ for $\lambda=0$ and the identity matrix $I_D$ for $\lambda=1$.
 
