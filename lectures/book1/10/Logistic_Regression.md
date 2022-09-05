@@ -673,7 +673,7 @@ $$
 \operatorname{PNLL}(W) = \operatorname{NLL}(W) + \lambda\|W\|_F^2
 $$
 
-where $\|W\|_F=\sqrt{\sum_{i,j}w_{ij}^2}$ is the **Frobenius norm** (eq. 7.27). At the optimum $\hat W$, it is required that
+where $\Vert W\Vert_F=\sqrt{\sum_{i,j}w_{ij}^2}$ is the **Frobenius norm** (eq. 7.27). At the optimum $\hat W$, it is required that
 
 $$
 \nabla_W\operatorname{PNLL}(\hat W) = \nabla_W\operatorname{NLL}(\hat W) + 2\lambda \hat W = \frac{1}{N}\sum_n(\hat\mu_n-y_n)\otimes x_n + 2\lambda \hat W = 0
