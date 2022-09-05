@@ -811,10 +811,10 @@ The set of parameters $\hat w_k$ that we sweep out in this way is known as the *
 
 > **Reference**: [Bis06, §3.3, p.152]
 >
-> In <u>maximum likelihood estimation</u> of a linear regression model, the <u>effective model complexity</u>:
+> In <u>maximum likelihood estimation</u> of a linear regression model, we have seen that
 >
-> - Needs to be controlled according to the <u>size of the data set</u> (to avoid overfitting).
-> - Can then be controlled by the value of the <u>regularization coefficient</u>.
+> - The <u>effective model complexity</u> needs to be controlled according to the <u>size of the data set</u> (to avoid overfitting).
+> - It can then be controlled by the value of the <u>regularization coefficient</u>.
 >
 > This leaves <u>the issue of deciding the appropriate model complexity</u> for the particular problem, which cannot be decided simply by maximizing the likelihood function.
 >
@@ -843,34 +843,34 @@ $$
 From §3.3.1 **Bayes rule for Gaussians**, the <u>posterior</u> is given by
 
 $$
-p(w|y;X,\sigma^2) \equiv \mathcal{N}(w|\tilde w,\tilde\Sigma) \propto \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma) \tag{3.37}
+p(w|y;X,\sigma^2) = \mathcal{N}(w|\tilde w,\tilde\Sigma) \propto \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma) \tag{3.37}
 $$
 
 where the inverse of the <u>posterior covariance</u> $\tilde\Sigma^{-1}\equiv\breve\Sigma^{-1}+\frac{1}{\sigma^2}X^TX$, and the <u>posterior mean</u> $\tilde w\equiv\tilde\Sigma \bigl( \frac{1}{\sigma^2}X^Ty+\breve\Sigma^{-1}\breve w \bigr)$.
 
 - Since the posterior is Gaussian, its mode $\hat w_\text{map}$ coincides with its mean $\tilde w$.
 
-- For example, $\breve w=0$, $\breve\Sigma=\tau^2I$, and $\lambda=\sigma^2/\tau^2$ <u>in ridge regression</u> so that
+- For example, $\breve w=0$, $\breve\Sigma=\tau^2I_D$, and $\lambda=\sigma^2/\tau^2$ <u>in ridge regression</u> so that
 
   $$
   \begin{gather*}
-  \tilde\Sigma^{-1} = \tfrac{1}{\tau^2}I + \tfrac{1}{\sigma^2}X^TX = \tfrac{1}{\sigma^2}(X^TX+\lambda I) \\
-  \tilde w = \sigma^2(X^TX+\lambda I)^{-1}\Bigl(\tfrac{1}{\sigma^2}X^Ty+0\Bigr)=(X^TX+\lambda I)^{-1}X^Ty
+  \tilde\Sigma^{-1} = \tfrac{1}{\tau^2}I_D + \tfrac{1}{\sigma^2}X^TX = \tfrac{1}{\sigma^2}(X^TX+\lambda I_D) \\
+  \tilde w = \sigma^2(X^TX+\lambda I_D)^{-1}\Bigl(\tfrac{1}{\sigma^2}X^Ty+0\Bigr)=(X^TX+\lambda I_D)^{-1}X^Ty
   \end{gather*}
   $$
   
 - In particular, if $\tau^2\to\infty$ (infinitely broad prior in ridge regression), the <u>posterior mean</u> $\tilde w=\hat w_\text{mle}=(X^TX)^{-1}X^Ty$ (eq. 11.9), and the inverse of the <u>posterior covariance</u> $\tilde\Sigma^{-1}=\frac{1}{\sigma^2}X^TX$.
 
 
-- If $N=0$, then the posterior reverts to the prior.
+- If $N=0$, i.e., $X=0$, then the posterior reverts to the prior.
 
-Furthermore, the <u>normalization constant</u> of the posterior (<u>marginal likelihood</u> or <u>model evidence</u>) is given by
+Furthermore, the <u>normalization constant</u> of the posterior is given by
 
 $$
 p(y) = \int \mathcal{N}(y|Xw,\sigma^2I_N)\,\mathcal{N}(w|\breve w,\breve\Sigma)\,dw = \mathcal{N}(y|X\breve w,\sigma^2I_N+X\breve\Sigma X^T) \tag{3.38}
 $$
 
-In <u>ridge regression</u>, we have a Gaussian $p(y)$ with the zero mean and the the covariance $\tau^2(XX^T+\lambda I_N)$.
+- In <u>ridge regression</u>, we have a Gaussian $p(y)=\mathcal{N}(y|0,\tau^2(XX^T+\lambda I_N))$.
 
 
 
@@ -880,56 +880,54 @@ In <u>ridge regression</u>, we have a Gaussian $p(y)$ with the zero mean and the
 >
 > We can illustrate Bayesian learning in a linear model, as well as the <u>sequential update of a posterior distribution</u>, using a simple example involving straight line fitting.
 >
-> **Linear model** of the form $y=f(x,w)=w_0+w_1x$, where the true parameters are $w_0=-0.3$ and $w_1=0.5$. 
+> **Linear model**: $y=f(x,w)=w_0+w_1x$, where the true parameters are $w_0=-0.3$ and $w_1=0.5$. 
 >
 > **Synthetic data**:
 >
 > 1. Choose $x_n\sim\mathcal{U}(-1,1)$ from the uniform distribution.
 > 2. Evaluate $y_n=f(x_n,w)+\epsilon_n$, where $\epsilon_n\sim\mathcal{N}(0,\sigma^2)$ is a Gaussian noise with $\sigma=0.2$.
 >
-> Our goal is to recover the values of $w_0$ and $w_1$ from such data, and we will explore the dependence on the size $N$ of the data set.
+> **Goal**: Recover $w_0$ and $w_1$ from $\mathcal{D}=\{(x_n,y_n)_{n=1:N}\}$, and explore the dependence on $N$.
 >
-> We assume that the noise variance $\sigma^2=(0.2)^2$ and $\tau^2=1/2$ so that $\lambda=\sigma^2/\tau^2=2(0.2)^2=0.08$.
+> **Hyperparameters**: $\sigma^2=(0.2)^2$ and $\tau^2=0.5$ so that $\lambda=\sigma^2/\tau^2=2(0.2)^2=0.08$.
 
 ![](figure_11.20.png)
 
-> Figure 11.20 shows the results of Bayesian learning in this model as the size $N$ of the data set is increased and demonstrates the <u>sequential nature of Bayesian learning</u> in which the current posterior distribution forms the prior when a new data point is observed.
+> Figure 11.20: Sequential Bayesian inference of the parameters of a linear regression model $p(y|x)=\mathcal{N}(y|w_0+w_1x,\sigma^2)$.
 >
-> - The <u>first row</u> corresponds to the situation <u>before any data points are observed</u> and shows a plot of the <u>prior</u> in $w=(w_0,w_1)$ space together with 10 samples of the function $y=f(x,w)$ in which the values of $w$ are drawn from the prior.
+> - <u>Left column</u>: Likelihood function $L(w_0,w_1)=\mathcal{N}(y_n|w_0+w_1x_n,\sigma^2)$ for the current data point $(x_n,y_n)$ shown by the <u>solid blue circle</u> in the right column.
+> - <u>Middle column</u>: Posterior $p(w|\mathcal{D}_N,\sigma^2)$ given first $N=0,1,2,100$ data points $\mathcal{D}_N$.
+> - <u>Right column</u>: 10 sample lines $y=f(x,w)$ where $w=(w_0,w_1)\sim p(w|\mathcal{D}_N,\sigma^2)$.
 >
-> - In the <u>second row</u>, we see the situation <u>after observing a single data point</u> $(x_1,y_1)$. The location of the data point is shown by a <u>blue (solid) circle</u> in the right-hand column. In the left-hand column is a plot of the likelihood $p(y_1|x_1;w,\sigma^2)$ as a function of $w$.
+> The <u>white cross</u> in the left and middle columns represents the true parameter $w_0=-0.3$ and $w_1=0.5$.
 >
->   Note that the likelihood provides a <u>soft constraint</u> that the line must pass close to the data point, where close is determined by the noise variance $\sigma^2=0.04$. For comparison, the true parameter values $w_0=−0.3$ and $w_1=0.5$ used to generate the data set are shown by a <u>white cross</u> in the plots in the left column. When we multiply this likelihood function by the prior from the top row, and normalize, we obtain the posterior distribution shown in the middle plot on the second row.
+> - <u>1st row</u>: Before any data points are observed. Prior distribution where $N=0$.
+> 
+> - <u>2nd row</u>: After observing a single data point $(x_1,y_1)$.
 >
->   Samples of the regression function $y=f(x,w)$ obtained by drawing samples of $w$ from this
->   posterior are shown in the right-hand plot. Note that these sample lines all pass close to the data point.
+>   Note that the likelihood provides a <u>soft constraint</u> that the line must pass close to the data point, where close is determined by the noise variance $\sigma^2=(0.2)^2$. When we multiply this likelihood function by the prior from the top row, and normalize, we obtain the posterior distribution shown in the middle plot on the second row.
 >
-> - The <u>third row</u> shows the <u>effect of observing a second data point</u> $(x_2,y_2)$, again shown by a <u>blue (solid) circle</u> in the plot in the right-hand column. The corresponding likelihood for this second data point alone is shown in the left plot. When we multiply this likelihood by the posterior from the second row, we obtain the posterior shown in the middle plot of the third row.
+>   Note that the sample lines in the right column all pass close to the data point.
+>   
+> - <u>3rd row</u>: After observing a second data point $(x_2,y_2)$.
 >
 >   Note that this is exactly the same posterior as would be obtained by combining the original prior with the likelihood function for the two data points. This posterior has now been influenced by two data points, and because two points are sufficient to define a line this already gives a relatively compact posterior.
 >
->   Samples from this posterior give rise to the functions shown in red in the third column, and we see that these functions pass close to both of the data points.
+>   Note that the sample lines in the third column pass close to both of the data points.
 >
-> - The <u>fourth row</u> shows the <u>effect of observing a total of 100 data points</u>. The left-hand plot shows the likelihood for the 100th data point alone, and the middle plot shows the resulting posterior that has now absorbed information from all 100 observations.
+> - <u>4th row</u>: After observing a total of 100 data points.
 >
->   Note how the posterior is much sharper than in the third row. In the limit of an infinite number of data points, the posterior would become a delta function centered on the true parameter values, shown by the white cross.
+>   Note how the posterior is much sharper than in the 3rd row. In the limit of an infinite number of data points, the posterior would become a delta function centered on the true parameter values, shown by the <u>white cross</u>.
 
 
 
 ### Maximal likelihood or model evidence
 
-In ridge regression, the <u>normalization constant of the posterior</u> is given by
-$$
-p(\mathcal{D}) = \mathcal{N}(y|0,\tau^2XX^T+\sigma^2 I_N) = \mathcal{N}(y|0,\tau^2(XX^T+\lambda I_N)) \tag{3.38}
-$$
-
-
-
 #### The evidence approximation: Empirical Bayes
 
 > **Reference**: [Bis06, §3.5.1, p.166-169]
 >
-> The marginal likelihood (or model evidence) function is obtained by integrating over $w$, so that in ridge regression
+> The <u>marginal likelihood</u> (or <u>model evidence</u>) function is obtained by integrating over $w$, so that in ridge regression
 >
 > $$
 > \begin{align*}
@@ -947,6 +945,7 @@ $$
 > $$
 >
 > *Proof.* Using $\tilde w^T\tilde\Sigma^{-1}=\frac{1}{\sigma^2}y^TX$, it follows that
+> 
 > $$
 > \begin{align*}
 > E(w) &= \frac{1}{\sigma^2}(y-Xw)^T(y-Xw)+\frac{1}{\tau^2}w^Tw \\
@@ -990,7 +989,7 @@ $$
 > \frac{\lambda}{\sigma^2}\tilde w^T\tilde w = D - \sum_d\frac{\lambda}{\sigma_d^2+\lambda} = \sum_d\Bigl(1-\frac{\lambda}{\sigma_d^2+\lambda}\Bigr) = \sum_d\frac{\sigma_d^2}{\sigma_d^2+\lambda} = \operatorname{dof}(\lambda)
 > $$
 >
-> - The value of $\lambda$ that <u>maximize the marginal likelihood</u> (or model evidence) satisfies
+> - The value of $\lambda$ that <u>maximize the marginal likelihood</u> satisfies
 >
 >   $$
 >   \lambda = \sigma^2\dfrac{\operatorname{dof}(\lambda)}{\tilde w^T\tilde w}
@@ -1002,23 +1001,25 @@ $$
 >
 > - Note that because $X^TX$ is fixed, we can compute its eigenvalues $\sigma_d^2$ once at the start.
 >
-> It should be emphasized that the value of $\lambda$ has been determined purely by <u>looking at the training data</u>. In contrast to maximum likelihood methods, <u>no independent data set is required</u> in order to optimize the model complexity.
+> It should be emphasized that $\lambda$ has been determined purely by <u>looking at the training data</u>. In contrast to maximum likelihood methods, <u>no independent data set (for validation) is required</u> in order to optimize the model complexity.
 
 
 
-#### Bayesian approach for choosing the strength of the regularizer
+#### §11.3.3 Choosing the strength of the regularizer: Bayesian approach 
 
 We can also use an <u>empirical Bayes approach</u> to choose $\lambda$. In particular, we choose the hyperparameter by computing
+
 $$
 \hat\lambda=\arg\max_\lambda\log p(\mathcal{D}|\lambda)
 $$
+
 Figure 4.7 (b) shows that <u>this gives essentially the same result as the CV estimate</u>.
 
 ![](figure_4.7_b.png)
 
-> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The <u>degree of regularization</u> increases from left to right, so <u>model complexity</u> decreases from left to right.
+> Figure 4.7: Ridge regression is applied to a degree 14 polynomial fit to 21 data points shown in Figure 4.5 for different values of the regularizer $\lambda$. The <u>degree $\lambda$ of regularization</u> increases from left to right, so <u>model complexity</u> decreases from left to right.
 >
-> (b) 5-fold cross-validation estimate of MSE; error bars are standard errors $\frac{\sigma}{\sqrt{N}}$ of the mean (in log scale). The blue vertical line is the point $\lambda$ chosen by the smallest MSE, and the red one is the estimation $\hat\lambda$ by empirical Bayes.
+> (b) 5-fold cross-validation estimate of MSE; blue dots are the log means and error bars are log standard errors $\frac{\sigma}{\sqrt{N}}$. The blue vertical line is the point $\lambda$ chosen by the smallest log mean, and the red one is the estimation $\hat\lambda$ by empirical Bayes.
 
 However, <u>the Bayesian approach has several advantages</u>.
 
@@ -1036,45 +1037,62 @@ We have discussed how to compute our uncertainty about the parameters of the mod
 From (eq. 3.38) we can show that the <u>posterior predictive distribution</u> at a test point $x$ is also Gaussian.
 
 $$
-\begin{split}
-p(y|x,\mathcal{D}) &= \int p(y|x;w)p(w|\mathcal{D})\,dw = \int\mathcal{N}(y|w^Tx,\sigma^2)\,\mathcal{N}(w|\mathring w,\mathring\Sigma)\,dw \\
-&= \mathcal{N}(y|\mathring w^Tx,\mathring\sigma_N^2(x))
-\end{split}
+\begin{align*}
+p(y|x,\mathcal{D}) &= \int p(y|x;w)p(w|\mathcal{D})\,dw = \int\mathcal{N}(y|w^Tx,\sigma^2)\,\mathcal{N}(w|\tilde w,\tilde\Sigma)\,dw \\
+&= \mathcal{N}(y|\tilde w^Tx,\tilde\sigma_N^2(x)) \tag{11.124}
+\end{align*}
 $$
 
-where $\mathring\sigma_N^2(x)\equiv\sigma^2I_N+x^T\mathring\Sigma x$ is the <u>variance of the posterior predictive distribution</u> at the point $x$ after seeing the $N$ training examples $\mathcal{D}$. The predicted variance depends on two terms, the <u>variance of the observation noise</u> $\sigma^2$, and the variance $\mathring\Sigma$ (which reflects the <u>uncertainty associated with</u> $w$).
+- $\tilde\sigma_N^2(x)\equiv\sigma^2+x^T\tilde\Sigma x$ is the <u>variance of the posterior predictive distribution</u> at the point $x$ after seeing the $N$ training examples $\mathcal{D}$.
+
+- The predicted variance $\tilde\sigma_N^2(x)$ depends on two terms, the <u>variance of the observation noise</u> $\sigma^2$, and the posterior variance $\tilde\Sigma$ (which reflects the <u>uncertainty associated with</u> $w$).
+
+
+
 
 > **Reference**: [Bis06, p.156]
 >
-> Note that, as additional data points are observed, the posterior distribution becomes narrower.
+> Note that, as additional data points are observed, the posterior predictive distribution becomes narrower.
 >
-> As a consequence it can be shown (Qazaz et al., 1997) that $\mathring\sigma_{N+1}^2(x)\leq\mathring\sigma_N^2(x)$. In the limit $N\to\infty$, the second term $x^T\mathring\Sigma x$ goes to zero, and the variance of the predictive distribution arises solely from the additive noise governed by the parameter $\sigma^2$.
+> - It can be shown (Qazaz et al., 1997) that $\tilde\sigma_N^2(x)\geq\tilde\sigma_{N+1}^2(x)$.
+> - In the limit $N\to\infty$, the second term $x^T\tilde\Sigma x\to 0$, and the variance of the posterior predictive distribution arises solely from the additive noise governed by $\sigma^2$.
 
-The latter translates into <u>variance about observations in a way which depends on how close $x$ is to the training data</u> $\mathcal{D}$. This is illustrated in Figure 11.21 (b).
+The second term $x^T\tilde\Sigma x$ translates into <u>variance about observations in a way which depends on how close $x$ is to the training data</u> $\mathcal{D}$. This is illustrated in Figure 11.21 (b).
 
 ![](figure_11.21_ab.png)
 
-> Figure 11.21: (a) Plugin approximation to predictive density (we plugin the MAP estimate $\hat w_\text{map}$) when fitting a second degree polynomial to some 1d data. (b) Posterior predictive density, obtained by integrating out the parameters. Black curve is <u>posterior mean</u>, error bars are <u>2 standard deviations</u> of the posterior predictive density.
+> Figure 11.21: (a) Plugin approximation to predictive density (we plugin the MAP estimate $\hat w_\text{map}$) when fitting a second degree polynomial to some 1d data.
+>
+> (b) <u>Posterior predictive density</u> $p(y|x,\mathcal{D})=\mathcal{N}(y|\tilde w^Tx,\tilde\sigma_N^2(x))$ obtained by integrating out $w$. (eq. 11.124)
+>
+> - Black curve is the <u>posterior mean</u> $y=\tilde w^Tx$.
+> - Error bars are <u>2 standard deviations</u> of the posterior predictive density, i.e., $2\tilde\sigma_N(x)$.
+>
+> Here, the training data $\mathcal{D}$ is given by $\phi(x)=(1,x,x^2)$ and $y=x^2+10x+\epsilon$, where $x=[-3,-2,0,2,3]^T$ and $\epsilon\sim\mathcal{N}(0,5^2)$. For parameter posterior $p(w|\mathcal{D})$, ridge regression is used with $\lambda=0.001$ so that $\tilde w=\hat w_\text{map}$.
+>
+
+
 
 In some cases, it is computationally intractable to compute the parameter posterior $p(w|\mathcal{D})$. In such cases, we may choose to use a point estimate $\hat w_\text{map}$, and then to use the plugin approximation.
-
 $$
 p(y|x,\mathcal{D}) = \int\mathcal{N}(y|w^Tx,\sigma^2)\,\delta(w-\hat w_\text{map})\,dw = \mathcal{N}(y|\hat w_\text{map}^Tx,\sigma^2)
 $$
 
 We see that the posterior predictive variance is constant, and independent of the data $\mathcal{D}$, as illustrated in Figure 11.21 (a).
 
+
+
+If we sample $w_s\sim\delta(w-\hat w_\text{map})$, we will always recover a single function $y=\hat w_\text{map}^Tx$, as shown in Figure 11.21 (c). By contrast, if we sample $w_s\sim\mathcal{N}(w|\tilde w,\tilde\Sigma)$, we will get a range of different functions $y=w_s^Tx$, as shown in Figure 11.21 (d), which more accurately reflects our uncertainty.
+
 ![](figure_11.21_cd.png)
 
 > Figure 11.21: (c) 10 samples from the plugin approximation to posterior predictive distribution. (d) 10 samples from the true posterior predictive distribution.
-
-If we sample $w_s\sim\delta(w-\hat w_\text{map})$, we will always recover a single function $y=\hat w_\text{map}^Tx$, as shown in Figure 11.21 (c). By contrast, if we sample $w_s\sim\mathcal{N}(w|\mathring w,\mathring\Sigma)$, we will get a range of different functions $y=w_s^Tx$, as shown in Figure 11.21 (d), which more accurately reflects our uncertainty.
 
 
 
 ### 11.7.5 The advantage of centering
 
-Notice that the shape of the 2d posterior in Figure 11.20 is an elongated ellipse (which eventually collapses to a point as $N\to\infty$). This implies that there is <u>a lot of posterior correlation</u> between $w_0$ and $w_1$, which can cause computational difficulties.
+Notice that the shape of the 2d posterior (middle column) in Figure 11.20 is an elongated ellipse (which eventually collapses to a point as $N\to\infty$). This implies that there is <u>a lot of posterior correlation</u> between $w_0$ and $w_1$, which can cause computational difficulties.
 
 - Each data point induces a likelihood function corresponding to a line which goes through the data point.
 - When we look at all the data together, we see that predictions with maximum likelihood must correspond to lines that go through the mean of the data $(\bar x, \bar y)$.
@@ -1087,23 +1105,28 @@ It can be hard to compute such elongated posteriors. One simple solution is to <
 
 > Figure 11.22: Posterior samples of $p(w|\mathcal{D})$ for 1d linear regression model $p(y|x,w)=\mathcal{N}(y|w^Tx,\sigma^2)$ with a Gaussian prior $\mathcal{N}(w|0,\Sigma)$. (a) Original data. (b) Centered data.
 >
-> - 100 data points $\mathcal{D}$ are generated by $y_n=w_0+w_1x_n+\epsilon_n$, where $x_n\sim\mathcal{N}(10,1)$ and $\epsilon_n\sim\mathcal{N}(0,\sigma^2)$ with $\sigma=0.5$. True weight values are $w_0=2.5$ and $w_1=0.9$. The mean $\bar x=10.2$.
-> - The prior covariance $\Sigma=\operatorname{diag}(10^2,1)$.
+> - 100 data points $\mathcal{D}$ are generated by $y_n=w_0+w_1x_n+\epsilon_n$, where $x_n\sim\mathcal{N}(10,1)$ and $\epsilon_n\sim\mathcal{N}(0,\sigma^2)$ with $\sigma=0.5$. True weight values are $w_0=2.5$ and $w_1=0.9$.
+> - The prior covariance $\Sigma=\begin{pmatrix} 10^2 & 0 \\ 0 & 1 \end{pmatrix}$.
 > - Posterior samples are generated by MCMC with `draws=1000` and `chains=2`.
 
-Note that we can convert the posterior derived from fitting to the centered data back to the original coordinates by noting that
+Note that we can convert the posterior derived <u>from (b) fitting to the centered data back to (a) the original coordinates</u> by noting that
 
 $$
 y' = w'_0 + w'_1x' = w'_0 + w'_1(x-\bar x) = (w'_0-w'_1\bar x)+w'_1x
 $$
 
-Thus the parameters on the uncentered data are $w_0=w'_0-w'_1\bar x$ and $w_1=w'_1$.
+Thus the parameters on the <u>uncentered data</u> are $w_0=w'_0-w'_1\bar x$ and $w_1=w'_1$.
+
+> In Figure 11.22, $\bar x=9.971$ and $\bar w'=(11.459,0.920)$. For example, $\bar w_1\approx\bar w_1'=0.920$ and $\bar w_0\approx\bar w_0'-\bar w_1'\bar x=11.459-0.920\times 9.971=2.286$.
 
 
 
 ### 11.7.6 Dealing with multicollinearity
 
-In many datasets, the input variables can be highly correlated with each other. Including all of them does not generally harm predictive accuracy (provided you use a suitable prior or regularizer to prevent overfitting). However, it can make interpretation of the coefficients more difficult.
+In many datasets, the input variables can be <u>highly correlated</u> with each other.
+
+- Including all of them <u>does not generally harm</u> predictive accuracy (provided you use a suitable prior or regularizer to prevent overfitting).
+- However, it can <u>make interpretation</u> of the coefficients <u>more difficult</u>.
 
 Suppose we have a dataset of $N$ people in which we record their heights $h_n$, as well as the length of their left legs $l_n$ and right legs $r_n$.
 
@@ -1115,23 +1138,33 @@ We want to predict the height of a person given measurement of their leg lengths
 - Linear regression to fit $p(h|l,r)=\mathcal{N}(h|\alpha+\beta_ll+\beta_rr,\sigma^2)$.
 - Vague priors, $\alpha,\beta_l,\beta_r\sim\mathcal{N}(0,10^2)$ and $\sigma\sim\operatorname{Expon}(1)$.
 
-
-
-We assume that $\bar\alpha=2$. Since the average leg length is $\bar l=\bar r=\bar\rho\cdot\bar h=0.45\cdot 10=4.5$, we might expect $\beta_l+\beta_r\approx\frac{\bar h-\bar\alpha}{\bar l}=\frac{10-2}{4.5}\approx 1.78$. However, the posterior marginals of $\beta_l$ and $\beta_r$ are quite different as shown in Figure 11.23.
-
 ![](figure_11.23.png)
 
 > Figure 11.23: Posterior marginals for the parameters in the multi-leg example.
+>
+> Here, $\bar\alpha=1.479$, $\bar\beta_l=1.131$, $\bar\beta_r=0.768$, and $\bar\sigma=0.622$.
+
+Since the average leg length is $\bar l=\bar r=\bar\rho\cdot\bar h=0.45\cdot 10=4.5$, we might expect
+$$
+\beta_l+\beta_r\approx\frac{\bar h-\bar\alpha}{\bar l}=\frac{10-1.479}{4.5}\approx 1.894
+$$
+However, the posterior marginals of $\beta_l$ and $\beta_r$ are quite different as shown in Figure 11.23.
 
 
-
-We can gain more insight by looking at the joint distribution $p(\beta_l,\beta_r|\mathcal{D})$ shown in Figure 11.24 (a). We see that the parameters are very highly correlated, so if $\beta_l$ is large, then $\beta_r$ is small, and vice versa. The marginal distribution for each parameter does not capture this. However, it does show that there is a lot of uncertainty about each parameter, showing that they are non-identifiable.
-
-However, their sum is well-determined, as can be seen from Figure 11.24 (b), where we plot $p(\beta_l+\beta_r|\mathcal{D})$; this is centered on 1.78, as we might expect.
 
 ![](figure_11.24.png)
 
-This example goes to show that we must be careful trying to interpret the significance of individual coefficient estimates in a model, since they do not mean much in isolation.
+> Figure 11.24: Posteriors for the multi-leg example. (a) Joint posterior $p(\beta_l,\beta_r|\mathcal{D})$. (b) Posterior of $p(\beta_l+\beta_r|\mathcal{D})$.
+
+We can gain more insight by looking at the joint distribution $p(\beta_l,\beta_r|\mathcal{D})$ shown in Figure 11.24 (a).
+
+- The parameters are very highly correlated, so if $\beta_l$ is large, then $\beta_r$ is small, and vice versa.
+- The marginal distribution for each parameter does not capture this.
+- However, it does show that there is a lot of uncertainty about each parameter, showing that they are non-identifiable.
+
+However, their sum is well-determined, as can be seen from Figure 11.24 (b), where we plot $p(\beta_l+\beta_r|\mathcal{D})$; this is centered on $\bar\beta_l+\bar\beta_r=1.899$, as we might expect.
+
+This example goes to show that we <u>must be careful</u> trying to interpret the significance of individual coefficient estimates in a model, since they do not mean much in isolation.
 
 
 
