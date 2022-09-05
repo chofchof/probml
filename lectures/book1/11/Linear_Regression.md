@@ -117,7 +117,7 @@ Even if it is theoretically possible to compute the pseudoinverse, we should not
    $$
    
    ```python
-from scipy.linalg import lstsq
+   from scipy.linalg import lstsq
    # lstsq.default_lapack_driver = 'gelsd'
    w, residues, rank, singular_values = lstsq(X, y)
    ```
@@ -205,6 +205,7 @@ Recall that it is called the **generalized least squares (GLS)** estimate if $\L
 
 
 Replacing $w_0$ with $\hat w_0=\bar y-w^T\bar x$, we have an equation similar to (eq. 11.6)
+
 $$
 \operatorname{RSS}(w) = \frac{1}{2}\sum_n\bigl[(y_n-\bar y)-w^T(x_n-\bar x)\bigr]^2
 = \frac{1}{2}(X_cw-y_c)^T(X_cw-y_c)
@@ -469,6 +470,7 @@ $$
 #### MLE can result in overfitting.
 
 **Ridge regression** can be derived as the <u>MAP estimation</u> of the posterior
+
 $$
 p(w|\mathcal{D}) \propto p(\mathcal{D}|w)\,p(w) = \mathcal{N}(y|Xw,\sigma^2I)\,\mathcal{N}(w|0,\tau^2I)
 $$
@@ -1145,9 +1147,11 @@ We want to predict the height of a person given measurement of their leg lengths
 > Here, $\bar\alpha=1.479$, $\bar\beta_l=1.131$, $\bar\beta_r=0.768$, and $\bar\sigma=0.622$.
 
 Since the average leg length is $\bar l=\bar r=\bar\rho\cdot\bar h=0.45\cdot 10=4.5$, we might expect
+
 $$
 \beta_l+\beta_r\approx\frac{\bar h-\bar\alpha}{\bar l}=\frac{10-1.479}{4.5}\approx 1.894
 $$
+
 However, the posterior marginals of $\beta_l$ and $\beta_r$ are quite different as shown in Figure 11.23.
 
 
