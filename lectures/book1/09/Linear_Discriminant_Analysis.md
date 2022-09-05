@@ -272,6 +272,7 @@ J(W) = \frac{|\tilde S_B|}{|\tilde S_W|} = \frac{|W^TS_BW|}{|W^TS_WW|}
 $$
 
 [https://arxiv.org/abs/1903.11240] According to Rayleigh-Ritz quotient method, the optimization problem:
+
 $$
 \max_w J(w) \equiv \max_w \frac{w^TS_Bw}{w^TS_Ww}
 $$
