@@ -1003,7 +1003,7 @@ Note that $\lambda_t(a)$ does not have a closed form solution in general, and mu
 >
 > (1) We assert that $0\lt Z(\tilde a_k)^{1-t}\lt 1$ and $(\tilde a_k)_c\leq 0$ for all $k$.
 >
-> > $(\because)$ Notice that if $a_{c_0}=\mu$ for some $c_0$, then ${(\tilde a_k)}_{c_0}=0$ for all $k$ so that there is at least one $c$ such that ${(\tilde a_k)}_c=0$ for all $k$. Since $C\geq 2$, we have $Z(\tilde a_k)=\sum_c\exp_t\lparen\tilde a_k\rparen_c>1$ so that $0<Z(\tilde a_k)^{1-t}<1$ for all $k$. It follows that $\lparen\tilde a_{k+1}\rparen_c=Z(\tilde a_k)^{1-t}\lparen\tilde a_0\rparen_c\leq 0$ for all $k$, since $\lparen\tilde a_0\rparen_c\leq 0$, for all $c$.
+> > $(\because)$ Notice that if $a_{c_0}=\mu$ for some $c_0$, then ${(\tilde a_k)}_{c_0}=0$ for all $k$ so that there is at least one $c$ such that $\lparen\tilde a_k\rparen_c=0$ for all $k$. Since $C\geq 2$, we have $Z(\tilde a_k)=\sum_c\exp_t\lparen\tilde a_k\rparen_c>1$ so that $0<Z(\tilde a_k)^{1-t}<1$ for all $k$. It follows that $\lparen\tilde a_{k+1}\rparen_c=Z(\tilde a_k)^{1-t}\lparen\tilde a_0\rparen_c\leq 0$ for all $k$, since $\lparen\tilde a_0\rparen_c\leq 0$, for all $c$.
 >
 > (2) We assert that $\lparen\tilde a_k\rparen_c$ is monotonically increasing for all $c$.
 >
@@ -1239,7 +1239,7 @@ Multinomial probit or multivariate probit (Check!)
 >    - **Binary classification**: $a\mapsto\mu=\sigma(a)\in\mathbb{R}\mapsto\operatorname{Ber}(y|\mu)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\mathbb{H}(y_n,\mu_n)$
 >    - **Multi-class classification**: $[a_c]\mapsto\mu=S([a_c])\in\mathbb{R}^C\mapsto\operatorname{Cat}(y|\mu)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\mathbb{H}(y_n,\mu_n)$
 >    - **Multi-label classification**: $[a_c]\mapsto[\mu_c=\sigma(a_c)]\in\mathbb{R}^C\mapsto\prod_c\operatorname{Ber}(y|\mu_c)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\sum_c\mathbb{H}(y_{nc},\mu_{nc})$
->    - **Multi-class multi-output classification**: $[a_{tc}]\mapsto {[\mu_t=S({[a_{tc}]}_c)]}_t\in\mathbb{R}^{TC}\mapsto\prod_t\operatorname{Cat}(y_t|\mu_t)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\sum_t\mathbb{H}(y_{nt},\mu_{nt})$
+>    - **Multi-class multi-output classification**: $[a_{tc}]\mapsto \lbrack\mu_t=S(\lbrack a_{tc}\rbrack_c)\rbrack_t\in\mathbb{R}^{TC}\mapsto\prod_t\operatorname{Cat}(y_t|\mu_t)$, and $\operatorname{NLL}(\theta)=\frac{1}{N}\sum_n\sum_t\mathbb{H}(y_{nt},\mu_{nt})$
 
 
 
