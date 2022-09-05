@@ -425,7 +425,7 @@ $$
 
 #### Multi-class, multi-label, and multi-output classification
 
-- In multinomial logistic regression ($C>2$), we assume that there is <u>only one true label</u>, i.e., $y\in\{1,\dotsc,C\}$ for an input. This is called **multi-class classification** in `scikit-learn`.
+- In multinomial logistic regression $(C>2)$, we assume that there is <u>only one true label</u>, i.e., $y\in\{1,\dotsc,C\}$ for an input. This is called **multi-class classification** in `scikit-learn`.
 
   ```python
   from sklearn.linear_model import LogisticRegression
@@ -1001,15 +1001,15 @@ Note that $\lambda_t(a)$ does not have a closed form solution in general, and mu
 > 
 > where $Z(a)\equiv\sum_c\exp_t(a_c)\in\mathbb{R}$ and $\mu\equiv\max_c\{a_c\}$.
 >
-> (1) We assert that $0<Z(\tilde a_k)^{1-t}<1$ and $(\tilde a_k)_c\leq 0$ for all $k$.
+> (1) We assert that $0\lt Z(\tilde a_k)^{1-t}\lt 1$ and $(\tilde a_k)_c\leq 0$ for all $k$.
 >
-> > ($\because$) Notice that if $a_{c_0}=\mu$ for some $c_0$, then ${(\tilde a_k)}_{c_0}=0$ for all $k$ so that there is at least one $c$ such that ${(\tilde a_k)}_c=0$ for all $k$. Since $C\geq 2$, we have $Z(\tilde a_k)=\sum_c\exp_t{(\tilde a_k)}_c>1$ so that $0<Z(\tilde a_k)^{1-t}<1$ for all $k$. It follows that ${(\tilde a_{k+1})}_c=Z(\tilde a_k)^{1-t}{(\tilde a_0)}_c\leq 0$ for all $k$, since ${(\tilde a_0)}_c\leq 0$, for all $c$.
+> > $(\because)$ Notice that if $a_{c_0}=\mu$ for some $c_0$, then ${(\tilde a_k)}_{c_0}=0$ for all $k$ so that there is at least one $c$ such that ${(\tilde a_k)}_c=0$ for all $k$. Since $C\geq 2$, we have $Z(\tilde a_k)=\sum_c\exp_t\lparen\tilde a_k\rparen_c>1$ so that $0<Z(\tilde a_k)^{1-t}<1$ for all $k$. It follows that $\lparen\tilde a_{k+1}\rparen_c=Z(\tilde a_k)^{1-t}\lparen\tilde a_0\rparen_c\leq 0$ for all $k$, since $\lparen\tilde a_0\rparen_c\leq 0$, for all $c$.
 >
-> (2) We assert that ${(\tilde a_k)}_c$ is monotonically increasing for all $c$.
+> (2) We assert that $\lparen\tilde a_k\rparen_c$ is monotonically increasing for all $c$.
 >
-> > ($\because$) It is trivial that ${(\tilde a_0)}_c\leq Z(\tilde a_0)^{1-t}{(\tilde a_0)}_c={(\tilde a_1)}_c$ for all $c$. Suppose ${(\tilde a_{k-1})}_c\leq{(\tilde a_k)}_c$ for all $c$. Then $Z(\tilde a_{k-1})=\sum_c\exp_t{(\tilde a_{k-1})}_c\leq\sum_c\exp_t{(\tilde a_k)_c}=Z(\tilde a_k)$. It follows that ${(\tilde a_k)}_c=Z(\tilde a_{k-1})^{1-t}{(\tilde a_0)}_c\leq Z(\tilde a_k)^{1-t}{(\tilde a_0)}_c={(\tilde a_{k+1})}_c$ for all $c$.
+> > $(\because)$ It is trivial that $\lparen\tilde a_0\rparen_c\leq Z(\tilde a_0)^{1-t}\lparen\tilde a_0\rparen_c=\lparen\tilde a_1\rparen_c$ for all $c$. Suppose $\lparen\tilde a_{k-1}\rparen_c\leq\lparen\tilde a_k\rparen_c$ for all $c$. Then $Z(\tilde a_{k-1})=\sum_c\exp_t\lparen\tilde a_{k-1}\rparen_c\leq\sum_c\exp_t\lparen\tilde a_k\rparen_c=Z(\tilde a_k)$. It follows that $\lparen\tilde a_k\rparen_c=Z(\tilde a_{k-1})^{1-t}\lparen\tilde a_0\rparen_c\leq Z(\tilde a_k)^{1-t}\lparen\tilde a_0\rparen_c=\lparen\tilde a_{k+1}\rparen_c$ for all $c$.
 >
-> Thus, the limit $\tilde a_c\equiv\lim_{k\to\infty}{(\tilde a_k)}_c$ exists for all $c$, in other words, we can define $\tilde a\equiv\lim_{k\to\infty}\tilde a_k$. Since $Z$ is continuous, we have
+> Thus, the limit $\tilde a_c\equiv\lim_{k\to\infty}\lparen\tilde a_k\rparen_c$ exists for all $c$, in other words, we can define $\tilde a\equiv\lim_{k\to\infty}\tilde a_k$. Since $Z$ is continuous, we have
 > 
 > $$
 > \tilde a=\lim_{k\to\infty}\tilde a_{k+1}=\lim_{k\to\infty}\bigl[Z(\tilde a_k)^{1-t}\tilde a_0\bigr]=Z\Bigl(\lim_{k\to\infty}\tilde a_k\Bigr)^{1-t}\tilde a_0=Z(\tilde a)^{1-t}\tilde a_0
