@@ -484,7 +484,7 @@ $$
 \operatorname{NLL}(W) = -\frac{1}{N}\log\prod_n\prod_c \mu_{nc}^{y_{nc}} = -\frac{1}{N}\sum_n\sum_c y_{nc}\log\mu_{nc} = \frac{1}{N}\sum_n\mathbb{H}(y_n,\mu_n) \tag{10.58}
 $$
 
-where $\mu_{nc}\equiv p(y_{nc}=1|x_n;\theta)=S(Wx_n){}_c$, and $y_n$ is represented by the one-hot encoding, i.e., $y_{nc}=\mathbb{I}(y_n=c)$ and $\sum_c y_{nc}=1$, and $\mathbb{H}(p,q)\equiv -\sum_c p_c\log q_c$ is the **cross-entropy**. 
+where $\mu_{nc}\equiv p(y_{nc}=1|x_n;\theta)$, and $y_n$ is represented by the one-hot encoding, i.e., $y_{nc}=\mathbb{I}(y_n=c)$ and $\sum_c y_{nc}=1$, and $\mathbb{H}(p,q)\equiv -\sum_c p_c\log q_c$ is the **cross-entropy**. 
 
 
 
